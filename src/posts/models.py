@@ -85,6 +85,12 @@ def create_slug(instance, new_slug=None):
 		return create_slug(instance, new_slug=new_slug)
 	return slug
 
+def image_upload_location(instance, filename):
+	return "%s" %(filename)
+
+class PostImage(models.Model):
+	imageid = models.ForeignKey('Post', on_delete=models.CASCADE, null=True, blank=True)
+	image = models.ImageField(null=True, blank=True, upload_to=image_upload_location)
 
 def pre_save_post_receiver(sender, instance, *args, **keyargs):
 	if not instance.slug:
@@ -94,9 +100,5 @@ def pre_save_post_receiver(sender, instance, *args, **keyargs):
 		html_string = instance.get_markdown()
 		read_time = get_read_time(html_string)
 		instance.read_time = read_time
-
-class PostImage(models.Model):
-	imageid = models.ForeignKey('Post', on_delete=models.CASCADE)
-	image = models.ImageField(null=True, blank=True, upload_to=upload_location)
 
 pre_save.connect(pre_save_post_receiver, sender=Post)
