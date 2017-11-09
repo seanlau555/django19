@@ -9,27 +9,23 @@
 
 {% block content %}
 
-<!-- {{ block.super}} -->
-<!-- <div class="col-sm-6">
-	<h2>Preview</h2>
-
-	<div class='content-preview>'>
-		<h4 id='preview-title'></h4>
-		<p id='preview-content'></p> 
-	</div>
-</div> -->
-
 <div class="col-sm-12">
 	<h2>Form </h2>
 
-<!-- 	<form method='POST' action='' enctype='multipart/form-data'> {% csrf_token %}
-{{ form|crispy }}
-		<input type='submit' class="btn btn-default" value='Create Post'/>
-	</form> -->
-
 	<input type="text" id="title"><br>
-	<div id="content"></div>
+
 	<input type="date" id="publish">
+	<hr>
+
+	<div id="sidebar-controls" class='col-sm-12'>
+<!-- 		<button id="show-controls">show control</i></button> -->
+		<span class="controls">
+			<button id="divider-button">Divider</button>
+			<button id="image-button">Image</button>
+			<button id="video-button">Video</button>
+		</span>
+	</div>
+	<div id="editor-container" class='col-sm-12'></div>
 
 	<script>
 		$(document).ready(function(){
@@ -50,7 +46,7 @@
 					return cookieValue;
 				}
 				var csrftoken = getCookie('csrftoken');
-				var jscontent = content.getContents();
+				var jscontent = quill.getContents();
 				var strcontent = JSON.stringify(jscontent.ops);
 
 				// content.setContents(JSON.parse(strcontent));
@@ -86,27 +82,112 @@
 			})
 		})
 
-		var content = new Quill('#content', {
+		let Inline = Quill.import('blots/inline');
+		let Block = Quill.import('blots/block');
+		let BlockEmbed = Quill.import('blots/block/embed');
+
+		class DividerBlot extends BlockEmbed { }
+		DividerBlot.blotName = 'divider';
+		DividerBlot.tagName = 'hr';
+
+		class ImageBlot extends BlockEmbed {
+			static create(value) {
+				let node = super.create();
+				node.innerHTML = "<img id='image' src='"+value.url+"' alt='"+value.alt+"'><br><p id='caption' style='color: #bbbbbb; font-style: italic';>"+value.text+"</p><br>";
+				return node;
+			}
+
+			static value(node) {
+				return {
+					alt: node.querySelector("#image").getAttribute('alt'),
+					url: node.querySelector("#image").getAttribute('src'),
+					text: node.querySelector("#caption").innerHTML
+				};
+			}
+		}
+		ImageBlot.blotName = 'imagewithcaption';
+		ImageBlot.tagName = 'div';
+
+		class VideoBlot extends BlockEmbed {
+			static create(url) {
+			let node = super.create();
+			node.setAttribute('src', url);
+			node.setAttribute('frameborder', '0');
+			node.setAttribute('allowfullscreen', true);
+			return node;
+			}
+
+			static formats(node) {
+				let format = {};
+				if (node.hasAttribute('height')) {
+					format.height = node.getAttribute('height');
+				}
+				if (node.hasAttribute('width')) {
+					format.width = node.getAttribute('width');
+				}
+				return format;
+			}
+
+			static value(node) {
+				return node.getAttribute('src');
+			}
+
+			format(name, value) {
+				if (name === 'height' || name === 'width') {
+					if (value) {
+						this.domNode.setAttribute(name, value);
+					} else {
+						this.domNode.removeAttribute(name, value);
+					}
+				} else {
+					super.format(name, value);
+				}
+			}
+		}
+		VideoBlot.blotName = 'video';
+		VideoBlot.tagName = 'iframe';
+
+		Quill.register(ImageBlot);
+		Quill.register(VideoBlot);
+		Quill.register(DividerBlot);
+
+		let quill = new Quill('#editor-container', {
 			modules: {
 				toolbar: [
 					[{ header: [1, 2, false] }],
 					['bold', 'italic', 'underline', 'strike'],
-					['blockquote', 'image', 'code-block'],
+					['blockquote', 'code-block'],
 				]
 			},
 			scrollingContainer: '#scrolling-container',
 			placeholder: 'Insert text here',
 			theme: 'bubble'
 		});
-		content.getModule('toolbar').addHandler('image', () => {
-			selectLocalImage();
-   		});
 
-		/**
-		* Step1. select local image
-		*
-		*/
-		function selectLocalImage() {
+		quill.addContainer($("#sidebar-controls").get(0));
+		quill.on(Quill.events.EDITOR_CHANGE, function(eventType, range) {
+			if (eventType !== Quill.events.SELECTION_CHANGE) return;
+			if (range == null) return;
+			if (range.length === 0) {
+				let [block, offset] = quill.scroll.descendant(Block, range.index);
+				if (block != null && block.domNode.firstChild instanceof HTMLBRElement) {
+					let lineBounds = quill.getBounds(range);
+					$('#sidebar-controls').removeClass('active').show().css({
+					left: lineBounds.left - 200,
+					top: lineBounds.top - 920
+					});
+				} else {
+					$('#sidebar-controls').hide();
+					$('#sidebar-controls').removeClass('active');
+				}
+			} else {
+				$('#sidebar-controls, #sidebar-controls').hide();
+				$('#sidebar-controls').removeClass('active');
+				let rangeBounds = quill.getBounds(range);
+			}
+		});
+
+		$('#image-button').click(function() {
 			var input = document.createElement('input');
 			input.setAttribute('type', 'file');
 			input.click();
@@ -122,7 +203,7 @@
 					console.warn('You could only upload images.');
 				}
 			};
-		}
+		});
 
 		/**
 		* Step2. save to server
@@ -151,7 +232,7 @@
 				return cookieValue;
 			}
 			var csrftoken = getCookie('csrftoken');
-			var jscontent = content.getContents();
+			var jscontent = quill.getContents();
 			var strcontent = JSON.stringify(jscontent.ops);
 
 			// content.setContents(JSON.parse(strcontent));
@@ -192,20 +273,40 @@
 		*/
 		function insertToEditor(url) {
 		// push image url to rich editor.
-			const range = content.getSelection();
-			content.insertEmbed(range.index, 'image', url);
+			const range = quill.getSelection();
+			var caption = prompt("Caption (optional)");
+			// quill.insertEmbed(range.index,"proc-link",{text: caption});
+			quill.insertEmbed(range.index, 'imagewithcaption', {alt: 'image', url: url, text: caption});
+			quill.formatLine(range.index, 1, 'align', 'center');
+			quill.setSelection(range.index + 3, Quill.sources.SILENT);
+			// content.clipboard.dangerouslyPasteHTML(range.index, '<img src="'+url+'" class="ql-embed-selected">');
+			// content.clipboard.dangerouslyPasteHTML(range.index, '<input type="textbox">');
 		}
 
-		// quill editor add image handler
-		content.getModule('toolbar').addHandler('image', () => {
-			selectLocalImage();
+		$('#video-button').click(function() {
+			let range = quill.getSelection(true);
+			let url = prompt('Enter link URL');
+			url = url.replace("watch?v=", "embed/");
+			quill.insertEmbed(range.index, 'video', url, Quill.sources.USER);
+			quill.formatText(range.index + 1, 1, { height: '170', width: '400' });
+			quill.setSelection(range.index + 1, Quill.sources.SILENT);
+			$('#sidebar-controls').hide();
+		});
+
+		$('#divider-button').click(function() {
+			let range = quill.getSelection(true);
+			quill.insertEmbed(range.index, 'divider', true, Quill.sources.USER);
+			quill.setSelection(range.index + 1, Quill.sources.SILENT);
+			$('#sidebar-controls').hide();
+		});
+
+		$('#show-controls').click(function() {
+			$('#sidebar-controls').toggleClass('active');
+			quill.focus();
 		});
 	</script>
 
-	<button id='submit'>Submit</button>
+	<div class='col-sm-12'><button id='submit'>Submit</button></div>
 </div>
-
-<script>
-</script>
 
 {% endblock%}
