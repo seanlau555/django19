@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block content %}
+
+{% block head_extra %}
+
 <script type="text/javascript">
 	let Inline = Quill.import('blots/inline');
 	let Block = Quill.import('blots/block');
@@ -62,6 +64,11 @@
 	Quill.register(VideoBlot);
 	Quill.register(DividerBlot);
 </script>
+
+{% endblock %}
+
+{% block content %}
+
 <div class='col-sm-6 col-sm-offset-3'>
 	<h1>{{ title }}</h1>
 

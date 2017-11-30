@@ -1,4 +1,4 @@
-from urllib import quote_plus
+import urllib.parse
 
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
@@ -20,7 +20,7 @@ def post_home(request):
 
 def post_create(request):
 
-	print request.user
+	print (request.user)
 
 	# if not request.user.is_staff or not request.user.is_superuser:
 	# 	raise Http404
@@ -52,7 +52,7 @@ def post_detail(request, slug=None):
 	if instance.draft or instance.publish > timezone.now().date():
 		if not request.user.is_staff or not request.user.is_superuser:
 			raise Http404
-	share_string = quote_plus(instance.content)
+	share_string = urllib.parse.quote(instance.content, safe='')#quote_plus(instance.content)
 	
 	initial_data = {
 		"content_type": instance.get_content_type,
@@ -132,7 +132,7 @@ def post_list(request):
 		"page_request_var": page_request_var,
 		"today": today,
 	}
-	return render(request, "post_list.html", context)
+	return render(request, "posts/post_list.html", context)
 
 def post_update(request, slug=None):
 	if not request.user.is_staff or not request.user.is_superuser:

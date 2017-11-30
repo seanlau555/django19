@@ -1,0 +1,8 @@
+.article_content p {
+    margin: 0 21px 12px;
+    word-wrap: break-word;
+}
+
+.article_content .ql-editor {
+    text-align: left;
+}

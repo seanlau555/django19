@@ -1,3 +1,4 @@
+
 p{
 	color: #006600;
 }
@@ -9,4 +10,183 @@ p{
 
 .comment-reply{
 	display: none;
+}
+
+body {
+	padding-top: 100px;
+} 
+
+.card {
+	display: block;
+	padding: 4px;
+	margin-bottom: 21px;
+	background-color: #ffffff;
+	-webkit-transition: border 0.2s ease-in-out;
+	-o-transition: border 0.2s ease-in-out;
+	transition: border 0.2s ease-in-out;
+}
+
+a {
+	color: #2c3e50;
+	text-decoration: none;
+}
+a:hover,
+a:focus {
+	color: #2c3e50;
+	text-decoration: underline;
+}
+a:focus {
+	outline: 5px auto -webkit-focus-ring-color;
+	outline-offset: -2px;
+}
+
+.navbar-brand > img {
+    display: block;
+    width: 120px;
+}
+
+/* Tell Quill not to scroll */
+#editor-container {
+	height: auto;
+	min-height: 100%;
+	/* padding: 50px; */
+}
+#editor-container .ql-editor {
+	font-size: 21px;
+	color: #2c3e50;
+	overflow-y: visible; 
+}
+
+#editor-container p {
+	color: #2c3e50;
+}
+
+/* Footer */
+
+footer {
+    position: relative;
+    z-index: 1;
+    margin: 24px auto 0;
+    padding: 0 24px;
+    border-top: 1px solid #dfdfdf;
+    clear: both;
+    max-width: 1440px
+}
+
+a.copy {
+    display: block;
+    width: 180px;
+    height: 36px;
+    line-height: 36px;
+    margin: 32px auto;
+    color: #2c3e50
+}
+
+footer a {
+	font-size: 21px;
+	color: #2c3e50;
+}
+
+#footer-links {
+    text-align: center;
+	margin: 0 auto;
+    line-height: 25px
+}
+
+#footer-links a:link {
+    color: #2c3e50;
+    display: block;
+    margin-top: 32px
+}
+
+#footer-links a:active,
+#footer-links a:hover,
+#footer-links a:visited {
+    color: #2c3e50
+}
+
+#footer-links .social {
+    display: block
+}
+
+#footer-links .social a {
+    position: relative;
+    display: inline-block;
+    width: 26px;
+    height: 26px;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: contain
+}
+
+#footer-links .social a:nth-child(2) {
+    margin: 0 40px
+}
+
+#footer-links .social .medium {
+    background-image: url(../img/medium.svg)
+}
+
+#footer-links .social .twitter {
+    background-image: url(../img/twitter.svg)
+}
+
+#footer-links .social .instagram {
+    background-image: url(../img/instagram.svg)
+}
+
+#footer-links .social .facebook {
+    background-image: url(../img/facebook.svg)
+}
+
+
+@media only screen and (min-width:768px) {
+    a.copy {
+        display: inline-block;
+        margin: 45px 0 44px 16px
+    }
+    #footer-links {
+        float: right;
+        margin: 20px 16px 0 0
+    }
+    #footer-links a:link {
+        display: inline-block
+    }
+    #footer-links>a:link {
+        margin-left: 40px
+    }
+    #footer-links .social {
+        display: inline-block;
+        float: right;
+        margin: 0 0 0 40px
+    }
+    #footer-links .social a {
+        display: inline-block
+    }
+}
+
+
+.screen-reader-only {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px
+}
+
+.screen-reader-only-focusable:active,
+.screen-reader-only-focusable:focus {
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+    clip: auto;
+    color: #008489;
+    height: auto;
+    overflow: visible;
+    padding: .5em;
+    position: fixed;
+    z-index: 3;
+    width: auto
 }

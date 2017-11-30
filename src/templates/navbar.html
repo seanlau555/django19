@@ -1,0 +1,85 @@
+{% load staticfiles %}
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img class="logo_image" src="{% static 'img/sparktake_logo_w.png' %}" />
+            </a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">                
+            <li><a href="{% url "posts:list" %}">Posts</a></li>
+            <li><a href="{% url "posts:create" %}">Create</a></li>
+            {% comment %} <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                
+                </ul>
+            </li> {% endcomment %}
+        </ul>
+
+        <form class="navbar-form navbar-left" role="search">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search" name="q">
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+        
+
+        <ul class="nav navbar-nav navbar-right">
+            
+            {% if request.user.is_authenticated %}
+            <li><a href="{% url 'auth_logout' %}">Logout</a></li>
+            {% else %}
+            {% if not request.user.is_authenticated and not "/accounts/login" in request.get_full_path %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Login <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        
+                        <form class='navbar-form' method='POST' action='{% url "auth_login" %}'>{% csrf_token %}
+                        <div class='form-group login-form-input'>
+                            <input type='text' class='form-control' name='username' placeholder='Username' />
+                        </div>
+                        <div class='form-group login-form-input'>
+                            <input type='password' class='form-control' name='password' placeholder='Password' />
+                        </div>
+                        <div class="form-check login-form-input">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input">
+                                Remember me
+                            </label>
+                        </div>
+                        <button type='submit' class='btn btn-default btn-block'>Login</button>
+                        </form>
+                        <li role="separator" class="divider"></li>
+                        <li><a class="dropdown-item-highlight" href="#">Sign up</a></li>
+                        <li><a class="dropdown-item-highlight" href="{% url 'auth_password_reset' %}">Forgot password?</a></li>
+                    </ul>
+                    
+                </li> 
+                {% endif %}
+            <li><a href="{% url 'registration_register' %}">Register</a></li>
+                
+            {% endif %}
+        </ul> 
+
+
+           
+        </div><!--/.navbar-collapse -->
+
+
+        
+    </div>
+</nav>
+
