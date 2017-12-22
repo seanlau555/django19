@@ -1,4 +1,19 @@
+    const data = new FormData();
+
+    var feature = document.getElementById('image');
+    feature.onchange = () => {
+        const file = feature.files[0];
+        // file type is only image.
+        if (!(/^image\//.test(file.type))) {
+            feature.value = "";
+            alert('You could only upload images.');
+        }else{
+            data.append('image', feature.files[0]);
+        }
+    };
+
     $(document).ready(function(){
+        //create post
         $('#submit').on('click', function(){
             function getCookie(name) {
                 var cookieValue = null;
@@ -33,15 +48,18 @@
                 }
             });
 
+            data.append('title', $('#title').val());
+            data.append('content', strcontent);
+            data.append('publish', $('#publish').val());
+
             $.ajax({
                 url: '/api/posts/create/',
+                processData: false,
                 method: 'POST',
                 dataType: "json",
-                data: {
-                    title: $('#title').val(),
-                    content: strcontent,
-                    publish: $('#publish').val(),
-                },success: function(t) {
+                contentType: false,
+                data: data,
+                success: function(t) {
                     // var pid=t.id;
                     console.log(t.id);
                     location.href = "../list/"
@@ -63,7 +81,7 @@
     class ImageBlot extends BlockEmbed {
         static create(value) {
             let node = super.create();
-            node.innerHTML = "<img id='image' src='"+value.url+"' alt='"+value.alt+"'><br><p id='caption' style='color: #bbbbbb; font-style: italic';>"+value.text+"</p><br>";
+            node.innerHTML = "<img id='image' src='"+value.url+"' alt='"+value.alt+"'><br><input id='caption' type='text'><br>";
             return node;
         }
 
@@ -71,7 +89,7 @@
             return {
                 alt: node.querySelector("#image").getAttribute('alt'),
                 url: node.querySelector("#image").getAttribute('src'),
-                text: node.querySelector("#caption").innerHTML
+                text: node.querySelector("#caption").value
             };
         }
     }
@@ -221,7 +239,7 @@
 
 
         $.ajax({
-            url: '../api/posts/image/create/',
+            url: '/api/posts/image/create/',
             processData: false,
             method: 'POST',
             dataType: "json",
@@ -244,9 +262,8 @@
     function insertToEditor(url) {
     // push image url to rich editor.
         const range = quill.getSelection();
-        var caption = prompt("Caption (optional)");
         // quill.insertEmbed(range.index,"proc-link",{text: caption});
-        quill.insertEmbed(range.index, 'imagewithcaption', {alt: 'image', url: url, text: caption});
+        quill.insertEmbed(range.index, 'imagewithcaption', {alt: 'image', url: url, text: ""});
         quill.formatLine(range.index, 1, 'align', 'center');
         quill.setSelection(range.index + 3, Quill.sources.SILENT);
         // content.clipboard.dangerouslyPasteHTML(range.index, '<img src="'+url+'" class="ql-embed-selected">');
@@ -257,17 +274,18 @@
         let range = quill.getSelection(true);
         let url = prompt('Enter link URL');
         url = url.replace("watch?v=", "embed/");
+        url = url.replace("&", "?");
         quill.insertEmbed(range.index, 'video', url, Quill.sources.USER);
         quill.formatText(range.index + 1, 1, { height: '170', width: '400' });
         quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        $('#sidebar-controls').hide();
+        // $('#sidebar-controls').hide();
     });
 
     $('#divider-button').click(function() {
         let range = quill.getSelection(true);
         quill.insertEmbed(range.index, 'divider', true, Quill.sources.USER);
         quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        $('#sidebar-controls').hide();
+        // $('#sidebar-controls').hide();
     });
 
     $('#show-controls').click(function() {
