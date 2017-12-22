@@ -57,6 +57,7 @@ class PostUpdateAPIView(RetrieveUpdateAPIView):
 	serializer_class = PostCreateUpdateSerializer
 	lookup_field = 'slug'
 	permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+	authentication_classes = [SessionAuthentication]
 
 	def perform_updated(self, serializer):
 		serializer.save(user=self.request.user)
