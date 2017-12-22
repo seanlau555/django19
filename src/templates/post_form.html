@@ -19,12 +19,18 @@
 	<div class="row">
 		<div class="col-sm-8 col-sm-offset-2">
 			<div class="col-sm-10">
-				<h2>Title </h2>				
+				<h2>Title </h2>
+{% if instance %}
+				<input class="form-control" type="text" id="title" value="{{ instance.title }}"><br>
+				<input type="date" id="publish" value="{{ instance.publish|date:'Y-m-d' }}">
+				<input type="file" name="image" id="image" class="clearablefileinput">
+				<img src='{{ instance.image.url }}' class='img-responsive'/>
+{% else %}
 				<input class="form-control" type="text" id="title"><br>
 				<input type="date" id="publish">
-				{% comment %} <input type="file" name="image" id="image" class="clearablefileinput"> {% endcomment %}
+				<input type="file" name="image" id="image" class="clearablefileinput">
+{% endif %}
 			</div>
-			<div class='col-sm-2'><button class="btn btn-primary" id='submit'>Submit</button></div>
 		</div>
 		
 	</div>
@@ -42,8 +48,19 @@
 			<article id="editor-container" ></article>
 		</div>
 	</div>
-<script src='{% static "js/post_form.js" %}'></script>
+	<div class='col-xs-12 col-sm-8 col-sm-offset-2''>
+		<button class="btn btn-primary" id='submit'>Submit</button>
+	</div>
 
+{% if instance %}
+	<script>
+		var content = {{ instance.content|safe }};
+		var slug = {{ instance.slug }};
+	</script>
+	<script src='{% static "js/post_update.js" %}'></script>
+{% else %}
+	<script src='{% static "js/post_form.js" %}'></script>
+{% endif %}
 
 {% endblock%}
 

@@ -19,6 +19,7 @@ class PostCreateUpdateSerializer(ModelSerializer):
 			'content',
 			'content_html',
 			'publish',
+			'image',
 		]
 
 class PostImageCreateSerializer(ModelSerializer):

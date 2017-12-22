@@ -53,16 +53,16 @@
             data.append('publish', $('#publish').val());
 
             $.ajax({
-                url: '/api/posts/create/',
+                url: '/api/posts/'+slug+'/edit/',
                 processData: false,
-                method: 'POST',
+                method: 'PUT',
                 dataType: "json",
                 contentType: false,
                 data: data,
                 success: function(t) {
                     // var pid=t.id;
                     console.log(t.id);
-                    location.href = "../list/"
+                    location.href = "../../list/"
                 },error: function(t) {
                     console.log(t);
                 }
@@ -81,7 +81,7 @@
     class ImageBlot extends BlockEmbed {
         static create(value) {
             let node = super.create();
-            node.innerHTML = "<img id='image' src='"+value.url+"' alt='"+value.alt+"'><br><input id='caption' type='text'><br>";
+            node.innerHTML = "<img id='image' src='"+value.url+"' alt='"+value.alt+"'><br><input id='caption' type='text' value='"+value.text+"'><br>";
             return node;
         }
 
@@ -174,6 +174,7 @@
             let rangeBounds = quill.getBounds(range);
         }
     });
+    quill.setContents(content);
 
     $('#image-button').click(function() {
         var input = document.createElement('input');
@@ -223,8 +224,6 @@
         var jscontent = quill.getContents();
         var strcontent = JSON.stringify(jscontent.ops);
 
-        // content.setContents(JSON.parse(strcontent));
-
         function csrfSafeMethod(method) {
             // these HTTP methods do not require CSRF protection
             return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
@@ -263,7 +262,7 @@
     // push image url to rich editor.
         const range = quill.getSelection();
         // quill.insertEmbed(range.index,"proc-link",{text: caption});
-        quill.insertEmbed(range.index, 'imagewithcaption', {alt: 'image', url: url, text: ""});
+        quill.insertEmbed(range.index, 'imagewithcaption', {alt: 'image', url: url, text: "tyu"});
         quill.formatLine(range.index, 1, 'align', 'center');
         quill.setSelection(range.index + 3, Quill.sources.SILENT);
         // content.clipboard.dangerouslyPasteHTML(range.index, '<img src="'+url+'" class="ql-embed-selected">');
