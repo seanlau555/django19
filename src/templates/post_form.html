@@ -30,6 +30,7 @@
 				<input type="date" id="publish">
 				<input type="file" name="image" id="image" class="clearablefileinput">
 {% endif %}
+				<button class="btn btn-primary" id='submit'>Submit</button>
 			</div>
 		</div>
 		
@@ -48,14 +49,11 @@
 			<article id="editor-container" ></article>
 		</div>
 	</div>
-	<div class='col-xs-12 col-sm-8 col-sm-offset-2''>
-		<button class="btn btn-primary" id='submit'>Submit</button>
-	</div>
 
 {% if instance %}
 	<script>
 		var content = {{ instance.content|safe }};
-		var slug = {{ instance.slug }};
+		var slug = "{{ instance.slug }}";
 	</script>
 	<script src='{% static "js/post_update.js" %}'></script>
 {% else %}
@@ -63,5 +61,3 @@
 {% endif %}
 
 {% endblock%}
-
-

@@ -1,3 +1,5 @@
+    let Delta = Quill.import('delta');
+
     const data = new FormData();
 
     var feature = document.getElementById('image');
@@ -33,6 +35,10 @@
             var csrftoken = getCookie('csrftoken');
             var jscontent = quill.getContents();
             var strcontent = JSON.stringify(jscontent.ops);
+
+            for(i = 0; i < document.getElementsByClassName('image').length; i++){
+                strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn", document.getElementById(document.getElementsByClassName('image')[i].getAttribute("src")).value);
+            }
 
             // content.setContents(JSON.parse(strcontent));
 
@@ -81,16 +87,24 @@
     class ImageBlot extends BlockEmbed {
         static create(value) {
             let node = super.create();
-            node.innerHTML = "<img id='image' src='"+value.url+"' alt='"+value.alt+"'><br><input id='caption' type='text' value='"+value.text+"'><br>";
+            node.innerHTML = "<img class='image' src='"+value.url+"' alt='"+value.alt+"'><br><input id='"+value.url+"' class='caption' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
             return node;
         }
 
         static value(node) {
-            return {
-                alt: node.querySelector("#image").getAttribute('alt'),
-                url: node.querySelector("#image").getAttribute('src'),
-                text: node.querySelector("#caption").value
-            };
+            if (node.querySelector(".image")){
+                return {
+                    alt: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn",
+                    url: node.querySelector(".image").getAttribute('src'),
+                    text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn"
+                };
+            }else{
+                return {
+                    alt: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn",
+                    url: "",
+                    text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn"
+                };
+            }
         }
     }
     ImageBlot.blotName = 'imagewithcaption';
@@ -141,6 +155,35 @@
 
     let quill = new Quill('#editor-container', {
         modules: {
+            clipboard: {
+                matchers: [
+                    ['div', function(node, delta) {
+                        divcontent = new Delta();
+                        for (i = 0; i < node.children.length; i++){
+                            if (node.children[i].tagName == "IMG"){
+                                img = node.children[i];
+                                divcontent.insert({imagewithcaption: {alt: img.alt, url: img.src, text: img.alt}}, {"align": "center"});
+                            }else{
+                                if (node.children[i].textContent){
+                                    divcontent.insert(node.children[i].textContent).insert("\n");
+                                }
+                            }
+                        }
+                        return divcontent;
+                    }],
+                    ['img', function(node, delta) {
+                        if (node.src){
+                            if (node.alt){
+                                alttext = node.alt;
+                            }else{
+                                alttext = "";
+                            }
+                            return new Delta().insert({imagewithcaption: {alt: node.alt, url: node.src, text: node.alt}}, {"align": "center"});
+                        }
+                            return new Delta();
+                    }],
+                ]
+            },
             toolbar: [
                 [{ header: [1, 2, false] }],
                 ['bold', 'italic', 'underline', 'strike'],
@@ -262,12 +305,14 @@
     // push image url to rich editor.
         const range = quill.getSelection();
         // quill.insertEmbed(range.index,"proc-link",{text: caption});
-        quill.insertEmbed(range.index, 'imagewithcaption', {alt: 'image', url: url, text: "tyu"});
+        quill.insertEmbed(range.index, 'imagewithcaption', {alt: 'image', url: url, text: ""});
         quill.formatLine(range.index, 1, 'align', 'center');
         quill.setSelection(range.index + 3, Quill.sources.SILENT);
         // content.clipboard.dangerouslyPasteHTML(range.index, '<img src="'+url+'" class="ql-embed-selected">');
         // content.clipboard.dangerouslyPasteHTML(range.index, '<input type="textbox">');
     }
+
+
 
     $('#video-button').click(function() {
         let range = quill.getSelection(true);
