@@ -36,8 +36,9 @@
             var jscontent = quill.getContents();
             var strcontent = JSON.stringify(jscontent.ops);
 
-            for(i = 0; i < document.getElementsByClassName('image').length; i++){
-                strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn", document.getElementById(document.getElementsByClassName('image')[i].getAttribute("src")).value);
+            for(x = 0; x < document.getElementsByClassName('image').length; x++){
+                strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEaLtcApTiOn", document.getElementById(document.getElementsByClassName('image')[x].getAttribute("src")).value);
+                strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn", document.getElementById(document.getElementsByClassName('image')[x].getAttribute("src")).value);
             }
 
             for(i = 0; i < document.getElementsByClassName('video').length; i++){
@@ -91,20 +92,20 @@
     class ImageBlot extends BlockEmbed {
         static create(value) {
             let node = super.create();
-            node.innerHTML = "<img class='image' src='"+value.url+"' alt='"+value.alt+"'><br><input id='"+value.url+"' class='caption' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
+            node.innerHTML = "<img class='image' src='"+value.url+"' alt='"+value.alt+"' style='width: 100%'><br><input id='"+value.url+"' class='caption' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
             return node;
         }
 
         static value(node) {
             if (node.querySelector(".image")){
                 return {
-                    alt: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn",
+                    alt: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEaLtcApTiOn",
                     url: node.querySelector(".image").getAttribute('src'),
                     text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn"
                 };
             }else{
                 return {
-                    alt: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn",
+                    alt: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEaLtcApTiOn",
                     url: "",
                     text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn"
                 };
@@ -261,7 +262,7 @@
             let rangeBounds = quill.getBounds(range);
         }
     });
-    
+
     quill.setContents(content);
 
     $('#image-button').click(function() {
