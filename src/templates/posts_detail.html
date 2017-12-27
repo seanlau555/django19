@@ -139,7 +139,7 @@ Linkedin
 		ImageBlot.blotName = 'imagewithcaption';
 		ImageBlot.tagName = 'div';
 
-		class VideoBlot extends BlockEmbed {
+		class YTVideoBlot extends BlockEmbed {
 			static create(url) {
 			let node = super.create();
 			node.setAttribute('src', url);
@@ -175,10 +175,21 @@ Linkedin
 				}
 			}
 		}
-		VideoBlot.blotName = 'video';
-		VideoBlot.tagName = 'iframe';
+		YTVideoBlot.blotName = 'ytvideo';
+		YTVideoBlot.tagName = 'iframe';
+
+	    class VideoBlot extends BlockEmbed {
+	        static create(value) {
+	            let node = super.create();
+	            node.innerHTML = "<video class='video' preload='auto' autoplay='autoplay' loop='loop' muted='muted'><source src='"+value.url+"'></video><br><p style='color: #bbbbbb; font-style: italic;'>"+value.text+"</p><br>";
+	            return node;
+	        }
+	    }
+	    VideoBlot.blotName = 'videowithcaption';
+	    VideoBlot.tagName = 'div';
 
 		Quill.register(ImageBlot);
+		Quill.register(YTVideoBlot);
 		Quill.register(VideoBlot);
 		Quill.register(DividerBlot);
 

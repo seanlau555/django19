@@ -40,6 +40,10 @@
                 strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn", document.getElementById(document.getElementsByClassName('image')[i].getAttribute("src")).value);
             }
 
+            for(i = 0; i < document.getElementsByClassName('video').length; i++){
+                strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn", document.getElementById(document.getElementsByClassName('video')[i].getAttribute("src")).value);
+            }
+
             // content.setContents(JSON.parse(strcontent));
 
             function csrfSafeMethod(method) {
@@ -110,7 +114,7 @@
     ImageBlot.blotName = 'imagewithcaption';
     ImageBlot.tagName = 'div';
 
-    class VideoBlot extends BlockEmbed {
+    class YTVideoBlot extends BlockEmbed {
         static create(url) {
         let node = super.create();
         node.setAttribute('src', url);
@@ -146,10 +150,35 @@
             }
         }
     }
-    VideoBlot.blotName = 'video';
-    VideoBlot.tagName = 'iframe';
+    YTVideoBlot.blotName = 'ytvideo';
+    YTVideoBlot.tagName = 'iframe';
+
+    class VideoBlot extends BlockEmbed {
+        static create(value) {
+            let node = super.create();
+            node.innerHTML = "<video class='video' preload='auto' autoplay='autoplay' loop='loop' muted='muted' src='"+value.url+"'></video><br><input id='"+value.url+"' class='caption' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
+            return node;
+        }
+
+        static value(node) {
+            if (node.querySelector(".video")){
+                return {
+                    url: node.querySelector(".video").getAttribute('src'),
+                    text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn"
+                };
+            }else{
+                return {
+                    url: "",
+                    text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn"
+                };
+            }
+        }
+    }
+    VideoBlot.blotName = 'videowithcaption';
+    VideoBlot.tagName = 'div';
 
     Quill.register(ImageBlot);
+    Quill.register(YTVideoBlot);
     Quill.register(VideoBlot);
     Quill.register(DividerBlot);
 
@@ -163,7 +192,22 @@
                             if (node.children[i].tagName == "IMG"){
                                 img = node.children[i];
                                 divcontent.insert({imagewithcaption: {alt: img.alt, url: img.src, text: img.alt}}, {"align": "center"});
+                            }else if (node.children[i].tagName == "VIDEO"){
+                                video = node.children[i];
+                                divcontent.insert({videowithcaption: {url: video.src, text: ""}}, {"align": "center"});
                             }else{
+                                if (node.children[i].querySelectorAll("img").length != 0){
+                                    for (j = 0; j < node.children[i].querySelectorAll("img").length; j++){
+                                        img = node.children[i].querySelectorAll("img")[j];
+                                        divcontent.insert({imagewithcaption: {alt: img.alt, url: img.src, text: img.alt}}, {"align": "center"});
+                                    }
+                                }
+                                if (node.children[i].querySelectorAll("video").length != 0){
+                                    for (j = 0; j < node.children[i].querySelectorAll("video").length; j++){
+                                        video = node.children[i].querySelectorAll("video")[j];
+                                        divcontent.insert({videowithcaption: {url: video.src, text: ""}}, {"align": "center"});
+                                    }
+                                }
                                 if (node.children[i].textContent){
                                     divcontent.insert(node.children[i].textContent).insert("\n");
                                 }
@@ -318,7 +362,7 @@
         let url = prompt('Enter link URL');
         url = url.replace("watch?v=", "embed/");
         url = url.replace("&", "?");
-        quill.insertEmbed(range.index, 'video', url, Quill.sources.USER);
+        quill.insertEmbed(range.index, 'ytvideo', url, Quill.sources.USER);
         quill.formatText(range.index + 1, 1, { height: '170', width: '400' });
         quill.setSelection(range.index + 1, Quill.sources.SILENT);
         // $('#sidebar-controls').hide();
