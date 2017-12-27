@@ -2,3 +2,5 @@ env
 settings.json
 *.pyc
 static_cdn
+
+media_cdn/

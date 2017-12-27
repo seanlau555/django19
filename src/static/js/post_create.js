@@ -8,10 +8,13 @@
             if (!$('#publish').val()){
                 $('#pubErr').css('visibility', 'visible');
             }
+            if (!$('#image').val()){
+                $('#featureErr').css('visibility', 'visible');
+            }
             if (quill.getText().trim().length === 0){
                 $('#contentErr').css('visibility', 'visible');
             }
-            if (($('#publish').val())&&($('#publish').val())&&!(quill.getText().trim().length === 0)){
+            if (($('#publish').val())&&($('#publish').val())&&($('#image').val())&&!(quill.getText().trim().length === 0)){
                 function getCookie(name) {
                     var cookieValue = null;
                     if (document.cookie && document.cookie !== '') {
@@ -36,8 +39,8 @@
                     strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn", document.getElementById(document.getElementsByClassName('image')[x].getAttribute("src")).value);
                 }
 
-                for(i = 0; i < document.getElementsByClassName('video').length; i++){
-                    strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn", document.getElementById(document.getElementsByClassName('video')[i].getAttribute("src")).value);
+                for(y = 0; y < document.getElementsByClassName('video').length; y++){
+                    strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn", document.getElementById(document.getElementsByClassName('video')[y].getAttribute("src")).value);
                 }
 
                 // content.setContents(JSON.parse(strcontent));
@@ -59,16 +62,16 @@
                 data.append('publish', $('#publish').val());
 
                 $.ajax({
-                    url: '/api/posts/'+slug+'/edit/',
+                    url: '/api/posts/create/',
                     processData: false,
-                    method: 'PUT',
+                    method: 'POST',
                     dataType: "json",
                     contentType: false,
                     data: data,
                     success: function(t) {
                         // var pid=t.id;
                         console.log(t.id);
-                        location.href = "../../list/"
+                        location.href = "../list/"
                     },error: function(t) {
                         console.log(t);
                     }
@@ -76,5 +79,3 @@
             }
         })
     });
-
-    quill.setContents(content);

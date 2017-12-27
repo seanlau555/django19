@@ -19,24 +19,77 @@
 	<div class="row">
 		<div class="col-sm-8 col-sm-offset-2">
 			<div class="col-sm-10">
-				<h2>Title </h2>
+				<table id='input'>
+					<tr>
+						<td colspan="2"><h2>Title: </h2></td>
+					</tr>
 {% if instance %}
-				<input class="form-control" type="text" id="title" value="{{ instance.title }}"><br>
-				<input type="date" id="publish" value="{{ instance.publish|date:'Y-m-d' }}">
-				<input type="file" name="image" id="image" class="clearablefileinput">
-				<img src='{{ instance.image.url }}' class='img-responsive'/>
+					<tr>
+						<td colspan="2">
+							<input class="form-control" type="text" id="title" value="{{ instance.title }}">
+							<br>
+							<p id='titleErr' class='err'>Title is required</p>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Publish Date: </h3></td>
+						<td>
+							<input type="date" id="publish" value="{{ instance.publish|date:'Y-m-d' }}">
+							<br>
+						</td>
+					</tr>
+					<tr>
+						<td><p id='pubErr' class='err'>Publish date is required</p></td>
+					</tr>
+					<tr>
+						<td><h3>Feature Image: </h3></td>
+						<td>
+							<input type="file" name="image" id="image" class="clearablefileinput">
+							<br>
+						</td>
+					</tr>
+					<tr>
+						<td><p id='featureErr' class='err'>Feature image is required</p></td>
+					</tr>
 {% else %}
-				<input class="form-control" type="text" id="title"><br>
-				<input type="date" id="publish">
-				<input type="file" name="image" id="image" class="clearablefileinput">
+					<tr>
+						<td colspan="2">
+							<input class="form-control" type="text" id="title">
+							<br>
+							<p id='titleErr' class='err'>Title is required</p>
+						</td>
+					</tr>
+					<tr>
+						<td><h3>Publish Date: </h3></td>
+						<td>
+							<input type="date" id="publish">
+							<br>
+						</td>
+					</tr>
+					<tr>
+						<td><p id='pubErr' class='err'>Publish date is required</p></td>
+					</tr>
+					<tr>
+						<td><h3>Feature Image: </h3></td>
+						<td>
+							<input type="file" name="image" id="image" class="clearablefileinput">
+							<br>
+						</td>
+					</tr>
+					<tr>
+						<td><p id='featureErr' class='err'>Feature image is required</p></td>
+					</tr>
 {% endif %}
-				<button class="btn btn-primary" id='submit'>Submit</button>
+					<tr>
+						<td><button class="btn btn-primary" id='submit'>Submit</button></td>
+					</tr>
+				</table>
 			</div>
 		</div>
 		
 	</div>
 	<hr>
-	<div id="sidebar-controls" class='col-sm-12'>
+	<div id="sidebar-controls" class='col-sm-12' style='display: none'>
 <!-- 		<button id="show-controls">show control</i></button> -->
 		<span class="controls">
 			<button id="divider-button">Divider</button>
@@ -46,6 +99,7 @@
 	</div>
 	<div class="row">
 		<div class='col-xs-12 col-sm-8 col-sm-offset-2'>
+			<p id='contentErr' class='err'>Content is empty</p>
 			<article id="editor-container" ></article>
 		</div>
 	</div>
@@ -54,10 +108,13 @@
 	<script>
 		var content = {{ instance.content|safe }};
 		var slug = "{{ instance.slug }}";
+		var imgUpdate = 1;
 	</script>
+	<script src='{% static "js/post_form.js" %}'></script>
 	<script src='{% static "js/post_update.js" %}'></script>
 {% else %}
 	<script src='{% static "js/post_form.js" %}'></script>
+	<script src='{% static "js/post_create.js" %}'></script>
 {% endif %}
 
 {% endblock%}
