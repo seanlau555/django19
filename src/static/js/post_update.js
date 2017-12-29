@@ -31,13 +31,17 @@
                 var jscontent = quill.getContents();
                 var strcontent = JSON.stringify(jscontent.ops);
 
-                for(x = 0; x < document.getElementsByClassName('image').length; x++){
-                    strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEaLtcApTiOn", document.getElementById(document.getElementsByClassName('image')[x].getAttribute("src")).value);
-                    strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn", document.getElementById(document.getElementsByClassName('image')[x].getAttribute("src")).value);
+                for (x = 0; x < document.getElementsByClassName('image').length; x++){
+                    for (y = 0; y < document.getElementsByClassName(document.getElementsByClassName('image')[x].getAttribute("src")).length; y++){
+                        strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEaLtcApTiOn", document.getElementsByClassName(document.getElementsByClassName('image')[x].getAttribute("src"))[y].value);
+                        strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn", document.getElementsByClassName(document.getElementsByClassName('image')[x].getAttribute("src"))[y].value);
+                    }
                 }
 
-                for(i = 0; i < document.getElementsByClassName('video').length; i++){
-                    strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn", document.getElementById(document.getElementsByClassName('video')[i].getAttribute("src")).value);
+                for (x = 0; x < document.getElementsByClassName('video').length; x++){
+                    for (y = 0; y < document.getElementsByClassName(document.getElementsByClassName('video')[x].getAttribute("src")).length; y++){
+                        strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn", document.getElementsByClassName(document.getElementsByClassName('video')[x].getAttribute("src"))[y].value);
+                    }
                 }
 
                 // content.setContents(JSON.parse(strcontent));

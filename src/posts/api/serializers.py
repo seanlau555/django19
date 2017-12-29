@@ -43,12 +43,12 @@ class PostListSerializer(ModelSerializer):
 			'content',
 			'content_html',
 			'publish',
+			'image',
 		]
 
 class PostDetailSerializer(ModelSerializer):
 	url = post_detail_url
 	user = UserDetailSerializer(read_only=True)
-	image = SerializerMethodField()
 	html = SerializerMethodField()
 	comment = SerializerMethodField()
 	class Meta:
@@ -66,12 +66,6 @@ class PostDetailSerializer(ModelSerializer):
 			'publish',
 		]
 
-	def get_image(self, obj):
-		try:
-			image = obj.image.url
-		except:
-			image =  None
-		return image
 	def get_html(self, obj):
 		return obj.get_markdown()
 

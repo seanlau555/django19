@@ -18,11 +18,14 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.generic.base import TemplateView
 
 from rest_framework_jwt.views import obtain_jwt_token
 
 from posts import views
 from accounts.views import (login_view, register_view, logout_view)
+
+from files.views import FilePolicyAPI, FileUploadCompleteHandler
 
 urlpatterns = [
     url(r'^$', views.post_home, name='home'),
@@ -39,6 +42,8 @@ urlpatterns = [
     url(r'^api/comments/', include("comments.api.urls", namespace='comments-api')),
     url(r'^api/users/', include("accounts.api.urls", namespace='users-api')),
     url(r'^api/token/auth/', obtain_jwt_token),
+    url(r'^api/files/policy/$', FilePolicyAPI.as_view(), name='upload-policy'),
+    url(r'^api/files/complete/$', FileUploadCompleteHandler.as_view(), name='upload-complete'),
 ]
 
 if settings.DEBUG:

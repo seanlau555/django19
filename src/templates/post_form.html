@@ -81,6 +81,15 @@
 					</tr>
 {% endif %}
 					<tr>
+						<td colspan="2">
+							<div class='featureImg'>
+{% if instance %}
+								<img src='{{ instance.image }}' alt='featureImg' width='100%'>
+{% endif %}
+							</div>
+						</td>
+					</tr>
+					<tr>
 						<td><button class="btn btn-primary" id='submit'>Submit</button></td>
 					</tr>
 				</table>
@@ -113,6 +122,9 @@
 	<script src='{% static "js/post_form.js" %}'></script>
 	<script src='{% static "js/post_update.js" %}'></script>
 {% else %}
+	<script>
+		var imgUpdate = 0;
+	</script>
 	<script src='{% static "js/post_form.js" %}'></script>
 	<script src='{% static "js/post_create.js" %}'></script>
 {% endif %}

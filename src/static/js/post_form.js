@@ -1,8 +1,46 @@
+    var fileItemList = [];
+
+    $(document).ready(function(){
+        // setup session cookie data. This is Django-related
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        // end session cookie data setup. 
+
+        //initialize err indicators
+        $('.err').css('visibility', 'hidden');
+    });
+
     let Delta = Quill.import('delta');
 
     const data = new FormData();
 
     var feature = document.getElementById('image');
+
     feature.onchange = () => {
         const file = feature.files[0];
         // file type is only image.
@@ -10,14 +48,115 @@
             feature.value = "";
             alert('You could only upload images.');
         }else{
-            data.append('image', feature.files[0]);
+            uploadFile(feature.files[0], "feature");
         }
     };
 
-    $(document).ready(function(){
-        //initialize err indicators
-        $('.err').css('visibility', 'hidden');
-    });
+    function constructFormPolicyData(policyData, fileItem) {
+        console.log(policyData);
+        var contentType = fileItem.type != '' ? fileItem.type : 'application/octet-stream'
+        var url = policyData.url
+        var filename = policyData.filename
+        var repsonseUser = policyData.user
+        // var keyPath = 'www/' + repsonseUser + '/' + filename
+        var keyPath = policyData.file_bucket_path
+        var fd = new FormData()
+        fd.append('key', keyPath + filename);
+        fd.append('acl','private');
+        fd.append('Content-Type', contentType);
+        fd.append("AWSAccessKeyId", policyData.key)
+        fd.append('Policy', policyData.policy);
+        fd.append('filename', filename);
+        fd.append('Signature', policyData.signature);
+        fd.append('file', fileItem);
+        return fd
+    }
+
+    function fileUploadComplete(fileItem, policyData, type){
+        filedata = {
+            uploaded: true,
+            fileSize: fileItem.size,
+            file: policyData.file_id,
+        }
+        $.ajax({
+            method:"POST",
+            data: filedata,
+            url: "/api/files/complete/",
+            success: function(successdata){
+                imgurl = policyData.url + policyData.file_bucket_path + policyData.filename;
+                data.append('image', imgurl);
+                if (type == "feature"){
+                    $('.featureImg').html("<img src='" + imgurl + "' alt='featureImg' width='100%'>")
+                }else if (type == "post"){
+                    saveToServer(imgurl);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown){ 
+                alert("An error occured, please refresh the page.")
+            }
+        })
+    }
+
+    function uploadFile(fileItem, type){
+            var policyData;
+            var newLoadingItem;
+            // get AWS upload policy for each file uploaded through the POST method
+            // Remember we're creating an instance in the backend so using POST is
+            // needed.
+            $.ajax({
+                method:"POST",
+                data: {
+                    filename: fileItem.name
+                },
+                url: "/api/files/policy/",
+                success: function(data){
+                        policyData = data
+                },
+                error: function(data){
+                    alert("An error occured, please try again later")
+                }
+            }).done(function(){
+                // construct the needed data using the policy for AWS
+                var fd = constructFormPolicyData(policyData, fileItem)
+
+                // use XML http Request to Send to AWS. 
+                var xhr = new XMLHttpRequest()
+
+                // construct callback for when uploading starts
+                xhr.upload.onloadstart = function(event){
+                    var inLoadingIndex = $.inArray(fileItem, fileItemList)
+                    if (inLoadingIndex == -1){
+                        // Item is not loading, add to inProgress queue
+                        newLoadingItem = {
+                            file: fileItem,
+                            id: policyData.file_id,
+                            order: fileItemList.length + 1
+                        }
+                        fileItemList.push(newLoadingItem)
+                      }
+                    fileItem.xhr = xhr
+                }
+
+                // Monitor upload progress and attach to fileItem.
+                // xhr.upload.addEventListener("progress", function(event){
+                //     if (event.lengthComputable) {
+                //      var progress = Math.round(event.loaded / event.total * 100);
+                //         fileItem.progress = progress
+                //                     // })
+
+                xhr.upload.addEventListener("load", function(event){
+                    console.log("Complete", event);
+                    // handle FileItem Upload being complete.
+                    setTimeout(()=>{
+                        fileUploadComplete(fileItem, policyData, type);
+                    }, 1000);
+                })
+
+                xhr.open('POST', policyData.url , true);
+                console.log(policyData.url);
+                xhr.send(fd);
+            })
+    };
 
     let Inline = Quill.import('blots/inline');
     let Block = Quill.import('blots/block');
@@ -30,7 +169,7 @@
     class ImageBlot extends BlockEmbed {
         static create(value) {
             let node = super.create();
-            node.innerHTML = "<img class='image' src='"+value.url+"' alt='"+value.alt+"'><br><input id='"+value.url+"' class='caption' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
+            node.innerHTML = "<img class='image' src='"+value.url+"' alt='"+value.alt+"'><br><input class='"+value.url+"' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
             return node;
         }
 
@@ -95,7 +234,7 @@
     class VideoBlot extends BlockEmbed {
         static create(value) {
             let node = super.create();
-            node.innerHTML = "<video class='video' preload='auto' autoplay='autoplay' loop='loop' muted='muted' src='"+value.url+"'></video><br><input id='"+value.url+"' class='caption' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
+            node.innerHTML = "<video class='video' preload='auto' autoplay='autoplay' loop='loop' muted='muted' src='"+value.url+"'></video><br><input class='"+value.url+"' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
             return node;
         }
 
@@ -215,7 +354,14 @@
             $('#pubErr').css('visibility', 'hidden');
         }
     });
-    $('#image').blur(function (){
+    $('#image').change(function (){
+        if ((!$('#image').val())||(imgUpdate === 1)){
+            $('#featureErr').css('visibility', 'visible');
+        }else{
+            $('#featureErr').css('visibility', 'hidden');
+        }
+    });
+    $('#image').click(function (){
         if ((!$('#image').val())||(imgUpdate === 1)){
             $('#featureErr').css('visibility', 'visible');
         }else{
@@ -243,7 +389,7 @@
 
             // file type is only image.
             if (/^image\//.test(file.type)) {
-                saveToServer(file);
+                uploadFile(file, "post");
             } else {
                 console.warn('You could only upload images.');
             }
@@ -255,11 +401,9 @@
     *
     * @param {File} file
     */
-    function saveToServer(file) {
+    function saveToServer(url) {
         const fd = new FormData();
-        fd.append('image', file);
-
-        console.log(file);
+        fd.append('image', url);
 
         function getCookie(name) {
             var cookieValue = null;
@@ -303,7 +447,6 @@
             contentType: false,
             data: fd
             ,success: function(t) {
-                console.log(t.image);
                 insertToEditor(t.image);
             },error: function(t) {
                 console.log(t);

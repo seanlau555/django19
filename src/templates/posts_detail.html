@@ -23,12 +23,12 @@
 
 <div class='col-sm-6 col-sm-offset-3'>
 {% if instance.image %}
-	<img src='{{ instance.image.url }}' class='img-responsive'/>
+	<img src='{{ instance.image }}' class='img-responsive'/>
 {% endif %}
 
 	<h1>{{ title }} <small>{% if instance.draft %} <span style = 'color:red;'>Draft</span>{% endif %}<br>{{ instance.publish }}</small></h1>
 
-	<p>Read time:{% if instance.read_time <= "01" %} <1 minute {% else %} {{ instance.read_time|time:"i" }} minutes {% endif %}</p>
+	<p>Read time:{% if instance.read_time <= 1 %} <1 minute {% else %} {{ instance.read_time }} minutes {% endif %}</p>
 
 	<p>
 		Author: {{ instance.user }}
