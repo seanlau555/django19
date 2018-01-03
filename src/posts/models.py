@@ -93,7 +93,7 @@ class PostImage(models.Model):
 	image = models.TextField(null=True, blank=True)
 
 def pre_save_post_receiver(sender, instance, *args, **keyargs):
-	if not instance.slug:
+	if (not instance.slug):
 		instance.slug = create_slug(instance)
 
 	# if instance.content:

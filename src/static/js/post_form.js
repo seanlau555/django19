@@ -1,5 +1,9 @@
     $(document).ready(function(){
-        $('.modal').hide();
+        //initialize err indicators
+        $('.err').css('visibility', 'hidden');
+
+        // $('.modal').hide();
+        
         // setup session cookie data. This is Django-related
         function getCookie(name) {
             var cookieValue = null;
@@ -29,9 +33,6 @@
             }
         });
         // end session cookie data setup.
-
-        //initialize err indicators
-        $('.err').css('visibility', 'hidden');
     });
 
     let Delta = Quill.import('delta');
@@ -107,6 +108,7 @@
         // progress.html("")
         // var html_ = "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + fileItem.progress + "%' aria-valuenow='" + fileItem.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>"
         // progress.append(fileItem.name + "<br/>" + html_ + "<hr/>");
+        $('#sidebar-controls').hide();
         let blot = Parchment.find(document.getElementById(fileItem.name));
         if (blot){
             range = blot.offset(quill.scroll);
@@ -149,7 +151,6 @@
                     // }
                     if (type == "post"){
                         range = quill.getSelection().index;
-                        console.log(range);
                     }
                 }
 
@@ -173,13 +174,13 @@
                     // handle FileItem Upload being complete.
                     setTimeout(()=>{
                         // $(".modal").modal("hide");
+                        $('#sidebar-controls').show();
                         if (type == "post"){
                             quill.deleteText(range, 1);
                         }
                         fileUploadComplete(fileItem, policyData, type);
                     }, 500);
                 })
-
                 xhr.open('POST', policyData.url , true);
                 xhr.send(fd);
             })

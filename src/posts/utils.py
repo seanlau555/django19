@@ -4,7 +4,7 @@ import re
 
 from django.utils.html import strip_tags
 
-def  count_words(html_string):
+def count_words(html_string):
 	word_string = strip_tags(html_string)
 	matching_words = re.findall(r'\w+', word_string)
 	count = len(matching_words)

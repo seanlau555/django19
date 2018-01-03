@@ -1,3 +1,4 @@
+from django.utils.text import slugify
 from django.db.models import Q
 
 from rest_framework.filters import (
@@ -18,12 +19,27 @@ from rest_framework.permissions import (
 	IsAdminUser,
 	IsAuthenticatedOrReadOnly,
 )
+
 from posts.models import Post, PostImage
 from .pagination import PostLimitOffsetPagination, PostPageNumberPagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import PostListSerializer, PostDetailSerializer, PostCreateUpdateSerializer, PostImageCreateSerializer
 from rest_framework.authentication import SessionAuthentication
 from django.contrib.auth.models import User
+import logging
+
+logger = logging.getLogger(__name__)
+
+def create_slug(instance, new_slug=None):
+	slug = slugify(instance.title)
+	if new_slug is not None:
+		slug = new_slug
+	qs = Post.objects.filter(slug=slug).order_by("-id")
+	exists = qs.exists()
+	if exists:
+		new_slug = "%s-%s" %(slug, qs.first().id)
+		return create_slug(instance, new_slug=new_slug)
+	return slug
 
 class PostCreateAPIView(CreateAPIView):
 	queryset = Post.objects.all()
@@ -55,8 +71,9 @@ class PostUpdateAPIView(RetrieveUpdateAPIView):
 	permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 	authentication_classes = [SessionAuthentication]
 
-	def perform_updated(self, serializer):
+	def perform_update(self, serializer):
 		serializer.save(user=self.request.user)
+		serializer.save(slug=create_slug(self.get_object()))
 
 class PostDeleteAPIView(DestroyAPIView):
 	queryset = Post.objects.all()
