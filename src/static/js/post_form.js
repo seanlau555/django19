@@ -1,6 +1,5 @@
-    var fileItemList = [];
-
     $(document).ready(function(){
+        $('.modal').hide();
         // setup session cookie data. This is Django-related
         function getCookie(name) {
             var cookieValue = null;
@@ -29,7 +28,7 @@
                 }
             }
         });
-        // end session cookie data setup. 
+        // end session cookie data setup.
 
         //initialize err indicators
         $('.err').css('visibility', 'hidden');
@@ -53,7 +52,6 @@
     };
 
     function constructFormPolicyData(policyData, fileItem) {
-        console.log(policyData);
         var contentType = fileItem.type != '' ? fileItem.type : 'application/octet-stream'
         var url = policyData.url
         var filename = policyData.filename
@@ -97,6 +95,26 @@
         })
     }
 
+    function displayProgress(fileItem){
+        var progress = $('.featureImg');
+        progress.html("")
+        var html_ = "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + fileItem.progress + "%' aria-valuenow='" + fileItem.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>"
+        progress.append(fileItem.name + "<br/>" + html_ + "<hr/>")
+    }
+
+    function modalProgress(fileItem){
+        // var progress = $('.modal-body');
+        // progress.html("")
+        // var html_ = "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + fileItem.progress + "%' aria-valuenow='" + fileItem.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>"
+        // progress.append(fileItem.name + "<br/>" + html_ + "<hr/>");
+        let blot = Parchment.find(document.getElementById(fileItem.name));
+        if (blot){
+            range = blot.offset(quill.scroll);
+        }
+        quill.deleteText(range, 1);
+        quill.insertEmbed(range, 'progress', fileItem);
+    }
+
     function uploadFile(fileItem, type){
             var policyData;
             var newLoadingItem;
@@ -124,36 +142,45 @@
 
                 // construct callback for when uploading starts
                 xhr.upload.onloadstart = function(event){
-                    var inLoadingIndex = $.inArray(fileItem, fileItemList)
-                    if (inLoadingIndex == -1){
-                        // Item is not loading, add to inProgress queue
-                        newLoadingItem = {
-                            file: fileItem,
-                            id: policyData.file_id,
-                            order: fileItemList.length + 1
-                        }
-                        fileItemList.push(newLoadingItem)
-                      }
                     fileItem.xhr = xhr
+                    // $('.modal-header').html('Image Loading...');
+                    // if (type == "post"){
+                    //     $(".modal").modal("show");
+                    // }
+                    if (type == "post"){
+                        range = quill.getSelection().index;
+                        console.log(range);
+                    }
                 }
 
-                // Monitor upload progress and attach to fileItem.
-                // xhr.upload.addEventListener("progress", function(event){
-                //     if (event.lengthComputable) {
-                //      var progress = Math.round(event.loaded / event.total * 100);
-                //         fileItem.progress = progress
-                //                     // })
+                xhr.upload.addEventListener("progress", function(event){
+                    if (type == "feature"){
+                        if (event.lengthComputable) {
+                            var progress = Math.round(event.loaded / event.total * 100);
+                            fileItem.progress = progress
+                            displayProgress(fileItem)
+                        }
+                    }else if (type == "post"){
+                        if (event.lengthComputable) {
+                            var progress = Math.round(event.loaded / event.total * 100);
+                            fileItem.progress = progress
+                            modalProgress(fileItem)
+                        }
+                    }
+                })
 
                 xhr.upload.addEventListener("load", function(event){
-                    console.log("Complete", event);
                     // handle FileItem Upload being complete.
                     setTimeout(()=>{
+                        // $(".modal").modal("hide");
+                        if (type == "post"){
+                            quill.deleteText(range, 1);
+                        }
                         fileUploadComplete(fileItem, policyData, type);
-                    }, 1000);
+                    }, 500);
                 })
 
                 xhr.open('POST', policyData.url , true);
-                console.log(policyData.url);
                 xhr.send(fd);
             })
     };
@@ -161,6 +188,7 @@
     let Inline = Quill.import('blots/inline');
     let Block = Quill.import('blots/block');
     let BlockEmbed = Quill.import('blots/block/embed');
+    let Parchment = Quill.import('parchment');
 
     class DividerBlot extends BlockEmbed { }
     DividerBlot.blotName = 'divider';
@@ -191,6 +219,17 @@
     }
     ImageBlot.blotName = 'imagewithcaption';
     ImageBlot.tagName = 'div';
+
+    class ProgressBlot extends BlockEmbed {
+        static create(value) {
+            let node = super.create();
+            node.setAttribute('id', value.name);
+            node.innerHTML = value.name + "<br/>" + "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + value.progress + "%' aria-valuenow='" + value.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>" + "<br/>";
+            return node;
+        }
+    }
+    ProgressBlot.blotName = 'progress';
+    ProgressBlot.tagName = 'div';
 
     class YTVideoBlot extends BlockEmbed {
         static create(url) {
@@ -259,6 +298,7 @@
     Quill.register(YTVideoBlot);
     Quill.register(VideoBlot);
     Quill.register(DividerBlot);
+    Quill.register(ProgressBlot);
 
     let quill = new Quill('#editor-container', {
         modules: {
@@ -294,6 +334,21 @@
                         return divcontent;
                     }],
                     ['img', function(node, delta) {
+                        // var url = node.src;
+                        // var xhr = new XMLHttpRequest();
+                        // xhr.open('GET', url, true);
+                        // xhr.onload = function(e) {
+                        //     if (this.status == 200) {
+                        //         var imgFile = this.response;
+                        //         imgFile.lastModifiedDate = new Date();
+                        //         imgFile.name = (node.alt) ? node.alt : "copiedImg";
+                        //         console.log(imgFile);
+                        //         copyalt = (node.alt) ? node.alt : "";
+                        //         uploadFile(imgFile, "post");
+                        //     }
+                        // };
+                        // xhr.send();
+
                         if (node.src){
                             if (node.alt){
                                 alttext = node.alt;
@@ -302,7 +357,7 @@
                             }
                             return new Delta().insert({imagewithcaption: {alt: node.alt, url: node.src, text: node.alt}}, {"align": "center"});
                         }
-                            return new Delta();
+                        return new Delta();
                     }],
                 ]
             },
@@ -326,8 +381,8 @@
             if (block != null && block.domNode.firstChild instanceof HTMLBRElement) {
                 let lineBounds = quill.getBounds(range);
                 $('#sidebar-controls').removeClass('active').show().css({
-                left: lineBounds.left,
-                top: lineBounds.top
+                left: lineBounds.left - 350,
+                top: lineBounds.top - 625
                 });
             } else {
                 $('#sidebar-controls').hide();
@@ -355,14 +410,14 @@
         }
     });
     $('#image').change(function (){
-        if ((!$('#image').val())||(imgUpdate === 1)){
+        if (!$('#image').val()){
             $('#featureErr').css('visibility', 'visible');
         }else{
             $('#featureErr').css('visibility', 'hidden');
         }
     });
     $('#image').click(function (){
-        if ((!$('#image').val())||(imgUpdate === 1)){
+        if (!$('#image').val()){
             $('#featureErr').css('visibility', 'visible');
         }else{
             $('#featureErr').css('visibility', 'hidden');
@@ -389,6 +444,7 @@
 
             // file type is only image.
             if (/^image\//.test(file.type)) {
+                copyalt = "";
                 uploadFile(file, "post");
             } else {
                 console.warn('You could only upload images.');
@@ -404,40 +460,6 @@
     function saveToServer(url) {
         const fd = new FormData();
         fd.append('image', url);
-
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        var csrftoken = getCookie('csrftoken');
-        var jscontent = quill.getContents();
-        var strcontent = JSON.stringify(jscontent.ops);
-
-        // content.setContents(JSON.parse(strcontent));
-
-        function csrfSafeMethod(method) {
-            // these HTTP methods do not require CSRF protection
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-        }
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                }
-            }
-        });
-
 
         $.ajax({
             url: '/api/posts/image/create/',
@@ -461,11 +483,14 @@
     */
     function insertToEditor(url) {
     // push image url to rich editor.
-        const range = quill.getSelection();
         // quill.insertEmbed(range.index,"proc-link",{text: caption});
-        quill.insertEmbed(range.index, 'imagewithcaption', {alt: 'image', url: url, text: ""});
-        quill.formatLine(range.index, 1, 'align', 'center');
-        quill.setSelection(range.index + 3, Quill.sources.SILENT);
+        // quill.setSelection(range, Quill.sources.SILENT);
+        if (range != 0){
+            quill.insertEmbed(range, '\n');
+        }
+        quill.insertEmbed(range, 'imagewithcaption', {alt: copyalt, url: url, text: ""});
+        quill.formatLine(range, 1, 'align', 'center');
+        quill.setSelection(range + 2, Quill.sources.SILENT);
         // content.clipboard.dangerouslyPasteHTML(range.index, '<img src="'+url+'" class="ql-embed-selected">');
         // content.clipboard.dangerouslyPasteHTML(range.index, '<input type="textbox">');
     }
@@ -491,4 +516,8 @@
     $('#show-controls').click(function() {
         $('#sidebar-controls').toggleClass('active');
         quill.focus();
+    });
+
+    $('#test').click(function() {
+        quill.deleteText(quill.getSelection().index - 1, 1);
     });

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% load urlify %}
 {% load crispy_forms_tags %}
 
@@ -7,21 +8,21 @@
 {% endblock head_title %}
 
 {% block post_detail_link %}
-
 <li><a href='{{ instance.get_absolute_url }}'>{{ instance.title }}</a></li>
 {% endblock %}
 
-<style>
-{% block style %}
-	h1{
-		color: #008800;
-	}
+{% block theme %}
+{{ form.media }}
+	<link rel="stylesheet" href='{% static "css/quill.core.min.css" %}'>
+	<link rel="stylesheet" href='{% static "css/editor.css" %}'>
 {% endblock %}
-</style>
+
+{% block head_extra %}
+{{ form.media }}
+{% endblock head_extra %}
 
 {% block content %}
-
-<div class='col-sm-6 col-sm-offset-3'>
+<div class='col-sm-8 col-sm-offset-2'>
 {% if instance.image %}
 	<img src='{{ instance.image }}' class='img-responsive'/>
 {% endif %}
@@ -29,7 +30,6 @@
 	<h1>{{ title }} <small>{% if instance.draft %} <span style = 'color:red;'>Draft</span>{% endif %}<br>{{ instance.publish }}</small></h1>
 
 	<p>Read time:{% if instance.read_time <= 1 %} <1 minute {% else %} {{ instance.read_time }} minutes {% endif %}</p>
-
 	<p>
 		Author: {{ instance.user }}
 {% if instance.user.get_full_name %}

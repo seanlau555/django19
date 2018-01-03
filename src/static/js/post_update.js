@@ -62,6 +62,18 @@
                 data.append('content', strcontent);
                 data.append('publish', $('#publish').val());
 
+                var regex = /\s+/gi;
+                var count = 0;
+                $.each($('.ql-editor').children('p'), function( key, value ) {
+                    count += value.innerText.trim().replace(regex, ' ').split(/\s/).length;
+                    if (value.innerText.trim().replace(regex, ' ').length === 0){
+                        count -=1;
+                    }
+                });
+                var read_time = Math.round(count/200);
+
+                data.append('read_time', read_time);
+
                 $.ajax({
                     url: '/api/posts/'+slug+'/edit/',
                     processData: false,
@@ -71,7 +83,6 @@
                     data: data,
                     success: function(t) {
                         // var pid=t.id;
-                        console.log(t.id);
                         location.href = "../../list/"
                     },error: function(t) {
                         console.log(t);

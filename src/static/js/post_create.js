@@ -1,5 +1,8 @@
     $(document).ready(function(){
-        //create post
+        //create blank post
+        
+
+        //update post
         $('#submit').on('click', function(){
             //check if empty
             if (!$('#title').val()){
@@ -64,6 +67,18 @@
                 data.append('title', $('#title').val());
                 data.append('content', strcontent);
                 data.append('publish', $('#publish').val());
+
+                var regex = /\s+/gi;
+                var count = 0;
+                $.each($('.ql-editor').children('p'), function( key, value ) {
+                    count += value.innerText.trim().replace(regex, ' ').split(/\s/).length;
+                    if (value.innerText.trim().replace(regex, ' ').length === 0){
+                        count -=1;
+                    }
+                });
+                var read_time = Math.round(count/200);
+
+                data.append('read_time', read_time);
 
                 $.ajax({
                     url: '/api/posts/create/',
