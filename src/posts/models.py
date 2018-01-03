@@ -28,7 +28,7 @@ class Post(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
 	title = models.CharField(max_length=120)
 	slug = models.SlugField(unique=True)
-	image = models.ImageField(null=True, blank=True, upload_to=upload_location, height_field="height_field", width_field="width_field")
+	image = models.TextField(null=True, blank=True)
 	height_field = models.IntegerField(default=0)
 	width_field = models.IntegerField(default=0)
 	content = models.TextField()
@@ -90,7 +90,7 @@ def image_upload_location(instance, filename):
 
 class PostImage(models.Model):
 	imageid = models.ForeignKey('Post', on_delete=models.CASCADE, null=True, blank=True)
-	image = models.ImageField(null=True, blank=True, upload_to=image_upload_location)
+	image = models.TextField(null=True, blank=True)
 
 def pre_save_post_receiver(sender, instance, *args, **keyargs):
 	if not instance.slug:

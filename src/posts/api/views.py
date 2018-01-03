@@ -1,9 +1,9 @@
 from django.db.models import Q
 
 from rest_framework.filters import (
-		SearchFilter,
-		OrderingFilter,
-	)
+	SearchFilter,
+	OrderingFilter,
+)
 from rest_framework.generics import (
 	CreateAPIView,
 	ListAPIView, 
@@ -11,15 +11,13 @@ from rest_framework.generics import (
 	RetrieveUpdateAPIView,
 	UpdateAPIView,
 	DestroyAPIView,
-	)
-
+)
 from rest_framework.permissions import (
 	AllowAny,
 	IsAuthenticated,
 	IsAdminUser,
 	IsAuthenticatedOrReadOnly,
-	)
-
+)
 from posts.models import Post, PostImage
 from .pagination import PostLimitOffsetPagination, PostPageNumberPagination
 from .permissions import IsOwnerOrReadOnly
@@ -43,8 +41,6 @@ class PostImageCreateAPIView(CreateAPIView):
 	serializer_class = PostImageCreateSerializer
 	permission_classes = [IsAuthenticated]
 	authentication_classes = [SessionAuthentication]
-
-	
 
 class PostDetailAPIView(RetrieveAPIView):
 	queryset = Post.objects.all()

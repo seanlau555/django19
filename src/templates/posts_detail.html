@@ -23,12 +23,12 @@
 
 <div class='col-sm-6 col-sm-offset-3'>
 {% if instance.image %}
-	<img src='{{ instance.image.url }}' class='img-responsive'/>
+	<img src='{{ instance.image }}' class='img-responsive'/>
 {% endif %}
 
 	<h1>{{ title }} <small>{% if instance.draft %} <span style = 'color:red;'>Draft</span>{% endif %}<br>{{ instance.publish }}</small></h1>
 
-	<p>Read time:{% if instance.read_time <= "01" %} <1 minute {% else %} {{ instance.read_time|time:"i" }} minutes {% endif %}</p>
+	<p>Read time:{% if instance.read_time <= 1 %} <1 minute {% else %} {{ instance.read_time }} minutes {% endif %}</p>
 
 	<p>
 		Author: {{ instance.user }}
@@ -132,14 +132,14 @@ Linkedin
 		class ImageBlot extends BlockEmbed {
 			static create(value) {
 				let node = super.create();
-				node.innerHTML = "<img src='"+value.url+"' alt='"+value.alt+"'><br><p style='color: #bbbbbb; font-style: italic';>"+value.text+"</p><br>";
+				node.innerHTML = "<img src='"+value.url+"' alt='"+value.alt+"'><br><p style='color: #bbbbbb; font-style: italic;'>"+value.text+"</p><br>";
 				return node;
 			}
 		}
 		ImageBlot.blotName = 'imagewithcaption';
 		ImageBlot.tagName = 'div';
 
-		class VideoBlot extends BlockEmbed {
+		class YTVideoBlot extends BlockEmbed {
 			static create(url) {
 			let node = super.create();
 			node.setAttribute('src', url);
@@ -175,10 +175,21 @@ Linkedin
 				}
 			}
 		}
-		VideoBlot.blotName = 'video';
-		VideoBlot.tagName = 'iframe';
+		YTVideoBlot.blotName = 'ytvideo';
+		YTVideoBlot.tagName = 'iframe';
+
+	    class VideoBlot extends BlockEmbed {
+	        static create(value) {
+	            let node = super.create();
+	            node.innerHTML = "<video class='video' preload='auto' autoplay='autoplay' loop='loop' muted='muted'><source src='"+value.url+"'></video><br><p style='color: #bbbbbb; font-style: italic;'>"+value.text+"</p><br>";
+	            return node;
+	        }
+	    }
+	    VideoBlot.blotName = 'videowithcaption';
+	    VideoBlot.tagName = 'div';
 
 		Quill.register(ImageBlot);
+		Quill.register(YTVideoBlot);
 		Quill.register(VideoBlot);
 		Quill.register(DividerBlot);
 
