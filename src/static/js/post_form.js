@@ -3,7 +3,7 @@
         $('.err').css('visibility', 'hidden');
 
         // $('.modal').hide();
-        
+
         // setup session cookie data. This is Django-related
         function getCookie(name) {
             var cookieValue = null;
@@ -460,8 +460,9 @@
     */
     function saveToServer(url) {
         const fd = new FormData();
-        fd.append('image', url);
-
+        fd.set('imageid', pid);
+        fd.set('image', url);
+        
         $.ajax({
             url: '/api/posts/image/create/',
             processData: false,
