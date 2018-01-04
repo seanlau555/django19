@@ -1,4 +1,7 @@
     $(document).ready(function(){
+        //image order
+        imgOrder = 0;
+
         //initialize err indicators
         $('.err').css('visibility', 'hidden');
 
@@ -87,7 +90,7 @@
                 if (type == "feature"){
                     $('.featureImg').html("<img src='" + imgurl + "' alt='featureImg' width='100%'>")
                 }else if (type == "post"){
-                    saveToServer(imgurl);
+                    saveToServer(imgurl, fileItem.range);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown){ 
@@ -108,13 +111,12 @@
         // progress.html("")
         // var html_ = "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + fileItem.progress + "%' aria-valuenow='" + fileItem.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>"
         // progress.append(fileItem.name + "<br/>" + html_ + "<hr/>");
-        $('#sidebar-controls').hide();
-        let blot = Parchment.find(document.getElementById(fileItem.name));
+        let blot = Parchment.find(document.getElementById(fileItem.id));
         if (blot){
             range = blot.offset(quill.scroll);
         }
-        quill.deleteText(range, 1);
-        quill.insertEmbed(range, 'progress', fileItem);
+        quill.deleteText(fileItem.range, 1);
+        quill.insertEmbed(fileItem.range, 'progress', fileItem);
     }
 
     function uploadFile(fileItem, type){
@@ -149,8 +151,11 @@
                     // if (type == "post"){
                     //     $(".modal").modal("show");
                     // }
+                    fileItem.id = imgOrder;
+                    imgOrder = imgOrder + 1;
+                    console.log(fileItem.id);
                     if (type == "post"){
-                        range = quill.getSelection().index;
+                        fileItem.range = quill.getSelection().index;
                     }
                 }
 
@@ -176,7 +181,7 @@
                         // $(".modal").modal("hide");
                         $('#sidebar-controls').show();
                         if (type == "post"){
-                            quill.deleteText(range, 1);
+                            quill.deleteText(fileItem.range, 1);
                         }
                         fileUploadComplete(fileItem, policyData, type);
                     }, 500);
@@ -224,7 +229,7 @@
     class ProgressBlot extends BlockEmbed {
         static create(value) {
             let node = super.create();
-            node.setAttribute('id', value.name);
+            node.setAttribute('id', value.id);
             node.innerHTML = value.name + "<br/>" + "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + value.progress + "%' aria-valuenow='" + value.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>" + "<br/>";
             return node;
         }
@@ -458,11 +463,11 @@
     *
     * @param {File} file
     */
-    function saveToServer(url) {
+    function saveToServer(url, range) {
         const fd = new FormData();
         fd.set('imageid', pid);
         fd.set('image', url);
-        
+
         $.ajax({
             url: '/api/posts/image/create/',
             processData: false,
@@ -471,7 +476,7 @@
             contentType: false,
             data: fd
             ,success: function(t) {
-                insertToEditor(t.image);
+                insertToEditor(t.image, range);
             },error: function(t) {
                 console.log(t);
             }
@@ -483,7 +488,7 @@
     *
     * @param {string} url
     */
-    function insertToEditor(url) {
+    function insertToEditor(url, range) {
     // push image url to rich editor.
         // quill.insertEmbed(range.index,"proc-link",{text: caption});
         // quill.setSelection(range, Quill.sources.SILENT);

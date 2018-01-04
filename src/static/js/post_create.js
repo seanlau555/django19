@@ -1,7 +1,7 @@
     $(document).ready(function(){
         function dataPreparation(){
-            var jscontent = quill.getContents();
-            var strcontent = JSON.stringify(jscontent.ops);
+            jscontent = quill.getContents();
+            strcontent = JSON.stringify(jscontent.ops);
 
             for (x = 0; x < document.getElementsByClassName('image').length; x++){
                 for (y = 0; y < document.getElementsByClassName(document.getElementsByClassName('image')[x].getAttribute("src")).length; y++){
@@ -15,6 +15,10 @@
                     strcontent = strcontent.replace("VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn", document.getElementsByClassName(document.getElementsByClassName('video')[x].getAttribute("src"))[y].value);
                 }
             }
+
+            strcontent = strcontent.replace(/{"insert":{"progress":true}},/g, "");
+            strcontent = strcontent.replace(/,{"insert":{"progress":true}}/g, "");
+            strcontent = strcontent.replace(/,{"insert":{"progress":true}},/g, "");
 
             data.set('title', $('#title').val());
             data.set('content', strcontent);
@@ -32,11 +36,6 @@
             var read_time = Math.round(count/200);
 
             data.append('read_time', read_time);
-
-            console.log(data.get('title'));
-            console.log(data.get('content'));
-            console.log(data.get('publish'));
-            console.log(data.get('image'));
         }
 
         //create blank post
@@ -50,6 +49,7 @@
             success: function(t) {
                 console.log(t);
                 pid = t.id;
+                //tracking updates of the post
                 setInterval(function(){
                     dataPreparation();
                     $.ajax({
@@ -71,7 +71,7 @@
             }
         })
 
-        //update post
+        //publish post
         $('#submit').on('click', function(){
             //check if empty
             if (!$('#title').val()){
@@ -105,7 +105,7 @@
                 var csrftoken = getCookie('csrftoken');
 
                 dataPreparation();
-                data.set('draft', false)
+                data.set('draft', false);
 
                 $.ajax({
                     url: '/api/posts/'+pid+'/edit/',

@@ -44,6 +44,10 @@
                     }
                 }
 
+                strcontent = strcontent.replace(/{"insert":{"progress":true}},/g, "");
+                strcontent = strcontent.replace(/,{"insert":{"progress":true}}/g, "");
+                strcontent = strcontent.replace(/,{"insert":{"progress":true}},/g, "");
+
                 // content.setContents(JSON.parse(strcontent));
 
                 function csrfSafeMethod(method) {
