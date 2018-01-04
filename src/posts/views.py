@@ -98,9 +98,9 @@ def post_detail(request, slug=None):
 
 def post_list(request):
 	today = timezone.now().date()
-	queryset_list = Post.objects.active() # .filter(draft=False).filter(publish__lte=timezone.now())
+	queryset_list = Post.objects.active().filter(draft=False) # .filter(draft=False).filter(publish__lte=timezone.now())
 	if request.user.is_staff or request.user.is_superuser:
-		queryset_list = Post.objects.all()
+		queryset_list = Post.objects.all().filter(draft=False)
 
 	query = request.GET.get("q")
 	if query:

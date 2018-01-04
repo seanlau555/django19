@@ -34,7 +34,7 @@ def create_slug(instance, new_slug=None):
 	slug = slugify(instance.title)
 	if new_slug is not None:
 		slug = new_slug
-	qs = Post.objects.filter(slug=slug).order_by("-id")
+	qs = Post.objects.filter(slug=slug).exclude(id=instance.id).order_by("-id")
 	exists = qs.exists()
 	if exists:
 		new_slug = "%s-%s" %(slug, qs.first().id)
@@ -62,12 +62,12 @@ class PostDetailAPIView(RetrieveAPIView):
 	queryset = Post.objects.all()
 	permission_classes = [AllowAny]
 	serializer_class = PostDetailSerializer
-	lookup_field = 'slug'
+	lookup_field = 'id'
 
 class PostUpdateAPIView(RetrieveUpdateAPIView):
 	queryset = Post.objects.all()
 	serializer_class = PostCreateUpdateSerializer
-	lookup_field = 'slug'
+	lookup_field = 'id'
 	permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 	authentication_classes = [SessionAuthentication]
 
@@ -78,7 +78,7 @@ class PostUpdateAPIView(RetrieveUpdateAPIView):
 class PostDeleteAPIView(DestroyAPIView):
 	queryset = Post.objects.all()
 	serializer_class = PostDetailSerializer
-	lookup_field = 'slug'
+	lookup_field = 'id'
 	permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 class PostListAPIView(ListAPIView):

@@ -75,7 +75,7 @@
                 data.append('read_time', read_time);
 
                 $.ajax({
-                    url: '/api/posts/'+slug+'/edit/',
+                    url: '/api/posts/'+pid+'/edit/',
                     processData: false,
                     method: 'PUT',
                     dataType: "json",

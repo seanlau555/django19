@@ -134,7 +134,7 @@
 {% if instance %}
 	<script>
 		var content = {{ instance.content|safe }};
-		var slug = "{{ instance.slug }}";
+		var pid = "{{ instance.id }}";
 		var imgUpdate = 1;
 	</script>
 	<script src='{% static "js/post_form.js" %}'></script>

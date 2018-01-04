@@ -13,6 +13,9 @@ from django.utils.text import slugify
 from comments.models import Comment
 from markdown_deux import markdown
 from .utils import get_read_time
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create your models here.
 # MVC Model View Controller
@@ -26,18 +29,18 @@ def upload_location(instance, filename):
 
 class Post(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
-	title = models.CharField(max_length=120)
-	slug = models.SlugField(unique=True)
+	title = models.CharField(max_length=120, null=True, blank=True)
+	slug = models.SlugField(null=True, blank=True)
 	image = models.TextField(null=True, blank=True)
 	height_field = models.IntegerField(default=0)
 	width_field = models.IntegerField(default=0)
-	content = models.TextField()
+	content = models.TextField(null=True, blank=True)
 	content_html = models.TextField(null=True, blank=True)
-	draft = models.BooleanField(default=False)
-	publish = models.DateField(auto_now=False, auto_now_add=False)
+	draft = models.BooleanField(default=True)
+	publish = models.DateField(null=True, blank=True, auto_now=False, auto_now_add=False)
 	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
-	read_time = models.IntegerField()# models.TimeField(null=True, blank=True)
+	read_time = models.IntegerField(null=True, blank=True)# models.TimeField(null=True, blank=True)
 
 	objects = PostManager()
 
@@ -45,11 +48,17 @@ class Post(models.Model):
 		return self.title
 
 	def __str__(self):
-		return self.title
+		if self.title:
+			return self.title
+		else:
+			return "None"
 
 	def get_absolute_url(self):
 		# return "/post/%s/" %(self.id)
-		return reverse("posts:detail", kwargs={"slug": self.slug})
+		if self.draft:
+			return ""
+		else:
+			return reverse("posts:detail", kwargs={"slug": self.slug})
 
 	def get_api_url(self):
 		# return "/post/%s/" %(self.id)
@@ -75,14 +84,17 @@ class Post(models.Model):
 		return content_type
 
 def create_slug(instance, new_slug=None):
-	slug = slugify(instance.title)
-	if new_slug is not None:
-		slug = new_slug
-	qs = Post.objects.filter(slug=slug).order_by("-id")
-	exists = qs.exists()
-	if exists:
-		new_slug = "%s-%s" %(slug, qs.first().id)
-		return create_slug(instance, new_slug=new_slug)
+	if instance.title:
+		slug = slugify(instance.title)
+		if new_slug is not None:
+			slug = new_slug
+		qs = Post.objects.filter(slug=slug).order_by("-id")
+		exists = qs.exists()
+		if exists:
+			new_slug = "%s-%s" %(slug, qs.first().id)
+			return create_slug(instance, new_slug=new_slug)
+	else:
+		slug = ""
 	return slug
 
 def image_upload_location(instance, filename):

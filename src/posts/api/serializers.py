@@ -7,7 +7,7 @@ from posts.models import Post, PostImage
 
 post_detail_url = HyperlinkedIdentityField(
 		view_name="posts-api:detail",
-		lookup_field='slug'
+		lookup_field='id'
 	)
 
 class PostCreateUpdateSerializer(ModelSerializer):
@@ -21,6 +21,7 @@ class PostCreateUpdateSerializer(ModelSerializer):
 			'publish',
 			'image',
 			'read_time',
+			'draft',
 		]
 
 class PostImageCreateSerializer(ModelSerializer):
