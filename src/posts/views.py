@@ -49,7 +49,7 @@ def post_detail(request, id=None):
 	# return HttpResponse("<h1>Detail</h1>")
 	# isntance = Post.objects.get(id=1)
 	instance = get_object_or_404(Post, id=id)
-	if instance.draft or instance.publish > timezone.now().date():
+	if not instance.published or instance.publish > timezone.now().date():
 		if not request.user.is_staff or not request.user.is_superuser or not request.user == instance.user:
 			raise Http404
 	share_string = urllib.parse.quote(instance.content, safe='')#quote_plus(instance.content)
@@ -98,7 +98,13 @@ def post_detail(request, id=None):
 
 def post_list(request):
 	today = timezone.now().date()
-	queryset_list = Post.objects.active().filter(private=False) # .filter(draft=False).filter(publish__lte=timezone.now())
+	queryset_list = Post.objects.all().filter(
+		(Q(draft=False) |
+		(Q(draft=True) & Q(published=True))) & 
+		Q(publish__lte=timezone.now()) & 
+		Q(private=False)).distinct() # .filter(draft=False).filter(publish__lte=timezone.now())
+	queryset_list.update(published=True)
+	carousel_list = queryset_list[:3]
 	if request.user.is_staff or request.user.is_superuser:
 		queryset_list = Post.objects.all().filter(draft=False)
 
@@ -127,6 +133,7 @@ def post_list(request):
 	# queryset = Post.objects.all()# .order_by("-timestamp")
 	context = {
 		"object_list": queryset,
+		"carousel_list": carousel_list,
 		"title": "List",
 		"page": page,
 		"page_request_var": page_request_var,

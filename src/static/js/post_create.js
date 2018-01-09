@@ -118,8 +118,6 @@
             //check if empty
             now = new Date;
             now = now.getFullYear() + '-' + ('0' + (now.getMonth()+1)).slice(-2) + "-" + ('0' + now.getDate()).slice(-2);
-            console.log(publish);
-            console.log(now);
 
             if (!$('#title').val()){
                 $('#titleErr').css('visibility', 'visible');
@@ -140,6 +138,8 @@
             if (($('#title').val())&&(publish)&&(publish >= now)&&($('.featureImg').find('img').length > 0)&&!(quill.getText().trim().length === 0)){
                 dataPreparation();
                 data.set('draft', false);
+                data.set('published', true);
+                data.set('content_display', strcontent);
 
                 $.ajax({
                     url: '/api/posts/'+pid+'/edit/',

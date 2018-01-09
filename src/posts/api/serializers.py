@@ -23,6 +23,8 @@ class PostCreateUpdateSerializer(ModelSerializer):
 			'read_time',
 			'draft',
 			'private',
+			'published',
+			'content_display',
 		]
 
 class PostImageCreateSerializer(ModelSerializer):
@@ -52,7 +54,6 @@ class PostListSerializer(ModelSerializer):
 class PostDetailSerializer(ModelSerializer):
 	url = post_detail_url
 	user = UserDetailSerializer(read_only=True)
-	html = SerializerMethodField()
 	comment = SerializerMethodField()
 	class Meta:
 		model = Post
@@ -60,17 +61,19 @@ class PostDetailSerializer(ModelSerializer):
 			'url',
 			'user',
 			'id',
+			'id',
 			'title',
-			'slug',
-			'image',
 			'content',
-			'comment',
-			'html',
+			'content_html',
 			'publish',
+			'image',
+			'read_time',
+			'draft',
+			'private',
+			'published',
+			'content_display',
+			'comment',
 		]
-
-	def get_html(self, obj):
-		return obj.get_markdown()
 
 	def get_comment(self, obj):
 		# content_type = obj.get_content_type

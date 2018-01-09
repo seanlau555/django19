@@ -67,6 +67,7 @@
             var read_time = Math.round(count/200);
 
             data.append('read_time', read_time);
+            data.set('published', published);
         }
 
         setInterval(function(){
@@ -114,6 +115,9 @@
             if (($('#title').val())&&($('#publish').val())&&(publish)&&($('.featureImg').find('img').length > 0)&&!(quill.getText().trim().length === 0)){
                 dataPreparation();
                 data.set('draft', false);
+                data.set('published', true);
+                data.set('content_display', strcontent);
+
 
                 $.ajax({
                     url: '/api/posts/'+pid+'/edit/',

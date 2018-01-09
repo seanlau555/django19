@@ -540,12 +540,11 @@
     });
 
     $('#test').click(function() {
-        // preview = quill.getText();
-        // length = preview.length;
-        // preview = preview.replace(/[\r\n]+/g, " ").substr(0, 49);
-        // if (length > 50){
-        //     preview = preview.concat("...");
-        // }
-        // console.log(preview);
-        console.log($("#checkbox").val());
+        preview = quill.getText();
+        length = preview.length;
+        preview = preview.replace(/[\r\n]+/g, " ").substr(0, 49);
+        if (length > 50){
+            preview = preview.concat("...");
+        }
+        console.log(preview);
     });

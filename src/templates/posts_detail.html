@@ -27,7 +27,7 @@
 	<img src='{{ instance.image }}' class='img-responsive'/>
 {% endif %}
 
-	<h1>{{ title }} <small>{% if instance.draft %} <span style = 'color:red;'>Draft</span>{% endif %}<br>{{ instance.publish }}</small></h1>
+	<h1>{{ title }}<br>{{ instance.publish }}</small></h1>
 
 	<p>Read time:{% if instance.read_time <= 1 %} <1 minute {% else %} {{ instance.read_time }} minutes {% endif %}</p>
 	<p>
@@ -199,7 +199,7 @@ Linkedin
 		theme: 'bubble'
 	});
 
-	content.setContents({{ instance.content|safe }});
+	content.setContents({{ instance.content_display|safe }});
 	content.enable(false);
 </script>
 

@@ -1,6 +1,5 @@
 <div class="col-sm-10">
-        {% for post in object_list%}
-    
+    {% for post in object_list%}
         {% if title == "My Posts" %}
         <div class='col-xs-12{{ col_class_set }}'>
             {% include "posts/post_item_draft.html" with post=post price="True" %}

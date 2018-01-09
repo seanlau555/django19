@@ -28,20 +28,22 @@ def upload_location(instance, filename):
 	return "%s/%s" %(instance.slug, filename)
 
 class Post(models.Model):
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1) #Author
 	title = models.CharField(max_length=120, null=True, blank=True)
 	slug = models.SlugField(null=True, blank=True)
-	image = models.TextField(null=True, blank=True)
+	image = models.TextField(null=True, blank=True) #Feature image
 	height_field = models.IntegerField(default=0)
 	width_field = models.IntegerField(default=0)
-	content = models.TextField(null=True, blank=True)
-	content_html = models.TextField(null=True, blank=True)
-	draft = models.BooleanField(default=True)
-	private = models.BooleanField(default=False)
-	publish = models.DateField(null=True, blank=True, auto_now=False, auto_now_add=False)
-	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
-	read_time = models.IntegerField(null=True, blank=True)# models.TimeField(null=True, blank=True)
+	content = models.TextField(null=True, blank=True) #Actual, up to date content
+	content_display = models.TextField(null=True, blank=True) #Unaltered, displaying content
+	content_html = models.TextField(null=True, blank=True) #preview
+	draft = models.BooleanField(default=True) #True if author leave the page without saving
+	private = models.BooleanField(default=False) #Set by author
+	published = models.BooleanField() #True if the post is posted already
+	publish = models.DateField(null=True, blank=True, auto_now=False, auto_now_add=False) #date which author want the post to be published
+	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True) #Create time
+	updated = models.DateTimeField(auto_now=True, auto_now_add=False) #Update time
+	read_time = models.IntegerField(null=True, blank=True)#No. of estimate read time in mins
 
 	objects = PostManager()
 

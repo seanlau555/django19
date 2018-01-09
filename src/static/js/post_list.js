@@ -67,6 +67,7 @@ $(document).ready(function(){
 
 		const data = new FormData();
         data.set('private', false);
+		data.set('published', true);
 
         $.ajax({
             url: '/api/posts/'+pid+'/edit/',
@@ -90,6 +91,7 @@ $(document).ready(function(){
 
 		const data = new FormData();
         data.set('private', true);
+		data.set('published', true);
 
         $.ajax({
             url: '/api/posts/'+pid+'/edit/',
@@ -110,18 +112,19 @@ $(document).ready(function(){
 
 	$(".delete").click(function(){
 		pid = this.id;
-
-        $.ajax({
-            url: '/api/posts/'+pid+'/delete/',
-            processData: false,
-            method: 'DELETE',
-            dataType: "json",
-            contentType: false,
-            success: function(t) {
-                location.reload();
-            },error: function(t) {
-                console.log(t);
-            }
-        })
+		if (confirm("Do you want to delete this post?")){
+	        $.ajax({
+	            url: '/api/posts/'+pid+'/delete/',
+	            processData: false,
+	            method: 'DELETE',
+	            dataType: "json",
+	            contentType: false,
+	            success: function(t) {
+	                location.reload();
+	            },error: function(t) {
+	                console.log(t);
+	            }
+	        })
+		}
 	})
 })

@@ -13,7 +13,7 @@
         <p>
             {{ post.user.get_full_name }}
             <span style="float: right;">
-    {% if post.draft == False and post.publish|date:"Y-m-d" <= now|date:"Y-m-d" %}
+    {% if post.published %}
     {% if post.private %}
             <button type="button" class="btn btn-info public" id="{{ post.id }}">Make it public<i class="fa fa-eye"></i></button>
     {% else %}
