@@ -1,0 +1,40 @@
+<div class="card">
+    <div class="postInfo">
+        <h3>
+        	<a href= '{{ post.get_absolute_url }}edit'>
+    {% if post.title %}
+        {{ post.title }}
+    {% else %}
+    	Untitled
+    {% endif %}
+    		</a>
+    		<small>{{ post.timestamp }}</small>
+    	</h3>
+        <p>
+            {{ post.user.get_full_name }}
+            <span style="float: right;">
+    {% if post.draft == False and post.publish|date:"Y-m-d" <= now|date:"Y-m-d" %}
+    {% if post.private %}
+            <button type="button" class="btn btn-info public" id="{{ post.id }}">Make it public<i class="fa fa-eye"></i></button>
+    {% else %}
+            <button type="button" class="btn btn-warning private" id="{{ post.id }}">Make it private<i class="fa fa-eye-slash"></i></button>
+    {% endif %}
+    {% else %}
+            <button type="button" class="btn btn-danger delete" id="{{ post.id }}">Delete<i class="fa fa-trash"></i></button>
+    {% endif %}
+            </span>
+        </p>
+        <p>{{ post.content_html }}</p>
+    {% if post.draft %}
+        <span class="label label-danger">Draft</span>
+    {% else %}
+    {% if post.publish|date:"Y-m-d" > now|date:"Y-m-d" %}
+        <span class="label label-success">Not published</span>
+    {% endif %}
+    {% if post.private %}
+        <span class="label label-primary">Private</span>
+    {% endif %}
+    {% endif %}
+    </div>
+    <div id='{{ post.id }}'></div>
+</div>

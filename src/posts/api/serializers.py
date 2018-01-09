@@ -22,6 +22,7 @@ class PostCreateUpdateSerializer(ModelSerializer):
 			'image',
 			'read_time',
 			'draft',
+			'private',
 		]
 
 class PostImageCreateSerializer(ModelSerializer):

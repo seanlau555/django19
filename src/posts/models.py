@@ -37,6 +37,7 @@ class Post(models.Model):
 	content = models.TextField(null=True, blank=True)
 	content_html = models.TextField(null=True, blank=True)
 	draft = models.BooleanField(default=True)
+	private = models.BooleanField(default=False)
 	publish = models.DateField(null=True, blank=True, auto_now=False, auto_now_add=False)
 	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True, auto_now_add=False)
@@ -54,11 +55,11 @@ class Post(models.Model):
 			return "None"
 
 	def get_absolute_url(self):
-		# return "/post/%s/" %(self.id)
-		if self.draft:
-			return ""
-		else:
-			return reverse("posts:detail", kwargs={"slug": self.slug})
+		return "/posts/%s/" %(self.id)
+		# if self.draft:
+		# 	return ""
+		# else:
+		# 	return reverse("posts:detail", kwargs={"slug": self.slug})
 
 	def get_api_url(self):
 		# return "/post/%s/" %(self.id)

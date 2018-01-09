@@ -5,8 +5,6 @@
         //initialize err indicators
         $('.err').css('visibility', 'hidden');
 
-        // $('.modal').hide();
-
         // setup session cookie data. This is Django-related
         function getCookie(name) {
             var cookieValue = null;
@@ -111,12 +109,17 @@
         // progress.html("")
         // var html_ = "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + fileItem.progress + "%' aria-valuenow='" + fileItem.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>"
         // progress.append(fileItem.name + "<br/>" + html_ + "<hr/>");
+        var cursor = quill.getSelection().index;
         let blot = Parchment.find(document.getElementById(fileItem.id));
         if (blot){
-            range = blot.offset(quill.scroll);
+            fileItem.range = blot.offset(quill.scroll);
         }
         quill.deleteText(fileItem.range, 1);
         quill.insertEmbed(fileItem.range, 'progress', fileItem);
+        if (document.getElementById(fileItem.id).nextSibling == null){
+            quill.insertEmbed(fileItem.range + 1, '\n');
+        }
+        quill.setSelection(fileItem.range + 1, Quill.sources.SILENT);
     }
 
     function uploadFile(fileItem, type){
@@ -179,7 +182,6 @@
                     // handle FileItem Upload being complete.
                     setTimeout(()=>{
                         // $(".modal").modal("hide");
-                        $('#sidebar-controls').show();
                         if (type == "post"){
                             quill.deleteText(fileItem.range, 1);
                         }
@@ -230,7 +232,7 @@
         static create(value) {
             let node = super.create();
             node.setAttribute('id', value.id);
-            node.innerHTML = value.name + "<br/>" + "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + value.progress + "%' aria-valuenow='" + value.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>" + "<br/>";
+            node.innerHTML = value.name + "<br/>" + "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + value.progress + "%' aria-valuenow='" + value.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>";
             return node;
         }
     }
@@ -378,7 +380,7 @@
         theme: 'bubble'
     });
 
-    quill.addContainer($("#sidebar-controls").get(0));
+    // quill.addContainer($("#sidebar-controls").get(0));
     quill.on(Quill.events.EDITOR_CHANGE, function(eventType, range) {
         if (eventType !== Quill.events.SELECTION_CHANGE) return;
         if (range == null) return;
@@ -386,16 +388,17 @@
             let [block, offset] = quill.scroll.descendant(Block, range.index);
             if (block != null && block.domNode.firstChild instanceof HTMLBRElement) {
                 let lineBounds = quill.getBounds(range);
-                $('#sidebar-controls').removeClass('active').show().css({
-                left: lineBounds.left - 350,
-                top: lineBounds.top - 625
-                });
+                $('#sidebar-controls').removeClass('active').css('visibility', 'visible');
+                // .css({
+                // left: lineBounds.left - 350,
+                // top: lineBounds.top - 625
+                // });
             } else {
-                $('#sidebar-controls').hide();
+                $('#sidebar-controls').css('visibility', 'hidden');;
                 $('#sidebar-controls').removeClass('active');
             }
         } else {
-            $('#sidebar-controls, #sidebar-controls').hide();
+            $('#sidebar-controls, #sidebar-controls').css('visibility', 'hidden');
             $('#sidebar-controls').removeClass('active');
             let rangeBounds = quill.getBounds(range);
         }
@@ -408,19 +411,35 @@
             $('#titleErr').css('visibility', 'hidden');
         }
     });
+    setInterval(function(){
+        if (!$("#now").prop("checked")){
+            $("#future").css('visibility', 'visible');
+        }else{
+            $("#future").css('visibility', 'hidden');
+            $('#pubErr').css('visibility', 'hidden');
+        }
+    }, 100);
     $('#publish').blur(function (){
         if (!$('#publish').val()){
             $('#pubErr').css('visibility', 'visible');
         }else{
-            $('#pubErr').css('visibility', 'hidden');
+            now = new Date;
+            now = now.getFullYear() + '-' + ('0' + (now.getMonth()+1)).slice(-2) + "-" + ('0' + now.getDate()).slice(-2);
+            if ($('#publish').val() < now){
+                $('#pubErr').css('visibility', 'visible');
+            }else{
+                $('#pubErr').css('visibility', 'hidden');
+            }
         }
     });
     $('#image').change(function (){
-        if (!$('#image').val()){
-            $('#featureErr').css('visibility', 'visible');
-        }else{
-            $('#featureErr').css('visibility', 'hidden');
-        }
+        setInterval(function(){
+            if ($('.featureImg').find('img').length === 0){
+                $('#featureErr').css('visibility', 'visible');
+            }else{
+                $('#featureErr').css('visibility', 'hidden');
+            }
+        }, 500)
     });
     $('#image').click(function (){
         if (!$('#image').val()){
@@ -520,11 +539,13 @@
         // $('#sidebar-controls').hide();
     });
 
-    $('#show-controls').click(function() {
-        $('#sidebar-controls').toggleClass('active');
-        quill.focus();
-    });
-
     $('#test').click(function() {
-        quill.deleteText(quill.getSelection().index - 1, 1);
+        // preview = quill.getText();
+        // length = preview.length;
+        // preview = preview.replace(/[\r\n]+/g, " ").substr(0, 49);
+        // if (length > 50){
+        //     preview = preview.concat("...");
+        // }
+        // console.log(preview);
+        console.log($("#checkbox").val());
     });

@@ -6,3 +6,9 @@
 .article_content .ql-editor {
     text-align: left;
 }
+
+#sidebar-controls{
+	position: fixed; /* Set the navbar to fixed position */
+    bottom: 100px; /* Position the navbar at the top of the page */
+    left: -50px;
+}

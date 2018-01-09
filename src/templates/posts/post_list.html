@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block content %}
 
 <div class='row'>
-	{% comment %} <h1>{{ title }}</h1>
-
+    {% comment %}
+    <h1>{{ title }}</h1>
 	<form method='GET' action='' class='row'>
 		<div class='col-sm-6'>
 			<div class='input-group'>
@@ -15,30 +16,114 @@
 				</span>
 			</div>
 		</div>
-	</form> {% endcomment %}
+	</form>
+    {% endcomment %}
+
+    {% if title == "My Posts" %}
+    <form method='GET' action='' class='col-sm-2' id="filter">
+        <table width="100%">
+            <tr>
+                <input type="hidden" class="form-control" name="q" {% if request.GET.q %}value="{{ request.GET.q }}"{% endif %}>
+                <td colspan='3'>Draft:</td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="radio" class="form-check-input d" name="draft" value="t" id="d1">
+                    <label class="form-check-label" for="d1">
+                        Yes
+                    </label>
+                </td>
+                <td>
+                    <input type="radio" class="form-check-input d" name="draft" value="f" id="d2">
+                    <label class="form-check-label" for="d2">
+                        No
+                    </label>
+                </td>
+                <td>
+                    <input type="radio" class="form-check-input d" name="draft" value="all" id="d3" checked>
+                    <label class="form-check-label" for="d3">
+                        All
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan='3'>Published:</td>
+            </tr>
+            <tr>
+                <td id="publish">
+                    <input type="radio" class="form-check-input p" name="publish" value="t" id="p1">
+                    <label class="form-check-label" for="p1">
+                        Yes
+                    </label>
+                </td>
+                <td>
+                    <input type="radio" class="form-check-input p" name="publish" value="f" id="p2">
+                    <label class="form-check-label" for="p2">
+                        No
+                    </label>
+                </td>
+                <td>
+                    <input type="radio" class="form-check-input p" name="publish" value="all" id="p3" checked>
+                    <label class="form-check-label" for="p3">
+                        All
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan='3'>Private:</td>
+            </tr>
+            <tr>
+                <td id="private">
+                    <input type="radio" class="form-check-input pri" name="private" value="t" id="pri1">
+                    <label class="form-check-label" for="pri1">
+                        Yes
+                    </label>
+                </td>
+                <td>
+                    <input type="radio" class="form-check-input pri" name="private" value="f" id="pri2">
+                    <label class="form-check-label" for="pri2">
+                        No
+                    </label>
+                </td>
+                <td>
+                    <input type="radio" class="form-check-input pri" name="private" value="all" id="pri3" checked>
+                    <label class="form-check-label" for="pri3">
+                        All
+                    </label>
+                </td>
+            </tr>
+
+        </table>
+        <button class='btn btn-default' type='submit'>Filter<i class="fa fa-filter"></i></button>
+    </form>
+    {% endif %}
     
     {% include "posts/posts.html" with object_list=object_list col_class_set="col-sm-4" %}
     
-	<div class="pagination">
+	<div class="col-sm-10 pagination">
 		<span class="step-links">
             {% if object_list.has_previous %}
-                        <a href="?{{page_request_var}}={{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
+                <a href="?{{page_request_var}}={{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.draft %}&draft={{ request.GET.draft }}{% endif %}{% if request.GET.publish %}&publish={{ request.GET.publish }}{% endif %}"><button class='btn btn-info'>previous</button></a>
+            {% else %}
+                <button class='btn btn-info' disabled>previous</button>
             {% endif %}
-
-                        <span class="current">
-            Page {{ object_list.number }} of {{ object_list.paginator.num_pages }}.
-                        </span>
-
+                <span class="current">
+                    Page {{ object_list.number }} of {{ object_list.paginator.num_pages }}.
+                </span>
             {% if object_list.has_next %}
-                        <a href="?{{page_request_var}}={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
+                <a href="?{{page_request_var}}={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.draft %}&draft={{ request.GET.draft }}{% endif %}{% if request.GET.publish %}&publish={{ request.GET.publish }}{% endif %}"><button class='btn btn-info'>next</button></a>
+            {% else %}
+                <button class='btn btn-info' disabled>next</button>
             {% endif %}
 		</span>
 	</div>
 </div>
-{% endblock content %}
 
+<script src='{% static "js/post_list.js" %}'></script>
+{% endblock %}
 
-{% comment %} {% for obj in object_list %}
+{% comment %}
+{% for obj in object_list %}
 <div class="row">
     <div class='col-sm-12'>
         <div class="thumbnail">
@@ -72,4 +157,5 @@
     content.setContents({{ obj.content|safe }});
     content.enable(false);
 </script>
-{% endfor %} {% endcomment %}
+{% endfor %}
+{% endcomment %}

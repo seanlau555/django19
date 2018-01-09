@@ -1,12 +1,13 @@
 <div class="card">
     {% if post.image %}
         <a href="{{ post.get_absolute_url }}">
-            <img src='{{ post.image }}' class='img-responsive'/>
-        </a>        
+            <img src='{{ post.image }}' height="250" width="300" style="
+            object-fit:cover;
+			-webkit-mask-image:-webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)))"/>
+        </a>
     {% endif %}
-    <div class="caption">
-        <h3><a href= '{{ post.get_absolute_url }}'>{{ post.title }}</a> <small><!-- {{ obj.timestamp|timesince }} ago -->{{ obj.publish }}</small></h3>
+    <div class="postInfo">
+        <h3><a href= '{{ post.get_absolute_url }}'>{{ post.title }}</a> <small><!-- {{ obj.timestamp|timesince }} ago -->{{ post.publish }}</small></h3>
         <p>{{ post.user.get_full_name }}</p>
     </div>
-    <div id='{{ obj.slug }}'></div>
 </div>

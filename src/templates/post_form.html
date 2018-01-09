@@ -13,8 +13,6 @@
 {% endblock head_extra %}
 
 {% block content %}
-
-
 	<div class="row">
 		<div class="col-sm-8 col-sm-offset-2">
 			<div class="col-sm-10">
@@ -32,13 +30,23 @@
 					</tr>
 					<tr>
 						<td><h3>Publish Date: </h3></td>
-						<td>
-							<input type="date" id="publish" value="{{ instance.publish|date:'Y-m-d' }}">
+						<td id="date">
+							Now? <input type="checkbox" id="now"> &nbsp&nbsp
+							<span id='future'>
+								<input type="date" id="publish" value="{{ instance.publish|date:'Y-m-d' }}">
+							</span>
 							<br>
 						</td>
 					</tr>
 					<tr>
-						<td><p id='pubErr' class='err'>Publish date is required</p></td>
+						<td colspan="2"><p id='pubErr' class='err'>Publish date is in the past or have not entered</p></td>
+					</tr>
+					<tr>
+						<td><h3>Private: </h3></td>
+						<td>
+							<input type="checkbox" id="private">
+							<br>
+						</td>
 					</tr>
 					<tr>
 						<td><h3>Feature Image: </h3></td>
@@ -48,7 +56,7 @@
 						</td>
 					</tr>
 					<tr>
-						<td><p id='featureErr' class='err'>Feature image is required</p></td>
+						<td colspan="2"><p id='featureErr' class='err'>Feature image is required</p></td>
 					</tr>
 {% else %}
 					<tr>
@@ -61,12 +69,22 @@
 					<tr>
 						<td><h3>Publish Date: </h3></td>
 						<td>
-							<input type="date" id="publish">
+							Now? <input type="checkbox" id="now" checked> &nbsp&nbsp
+							<span id='future' style="visibility: hidden;">
+								<input type="date" id="publish">
+							</span>
 							<br>
 						</td>
 					</tr>
 					<tr>
-						<td><p id='pubErr' class='err'>Publish date is required</p></td>
+						<td><p id='pubErr' class='err'>Publish date is in the past or have not entered</p></td>
+					</tr>
+					<tr>
+						<td><h3>Private: </h3></td>
+						<td>
+							<input type="checkbox" id="private">
+							<br>
+						</td>
 					</tr>
 					<tr>
 						<td><h3>Feature Image: </h3></td>
@@ -82,7 +100,7 @@
 					<tr>
 						<td colspan="2">
 							<div class='featureImg'>
-{% if instance %}
+{% if instance.image %}
 								<img src='{{ instance.image }}' alt='featureImg' width='100%'>
 {% endif %}
 							</div>
@@ -90,23 +108,23 @@
 					</tr>
 					<tr>
 						<td><button class="btn btn-primary" id='submit'>Submit</button></td>
-						<td><button class="btn btn-primary" id='test'>delete</button></td>
+						<td><input type="checkbox" id="testbox"><button class="btn btn-primary" id='test'>Test</button></td>
 					</tr>
 				</table>
 			</div>
 		</div>
-		
 	</div>
 	<hr>
-	<div id="sidebar-controls" class='col-sm-12' style='display: none'>
-<!-- 		<button id="show-controls">show control</i></button> -->
-		<span class="controls">
-			<button id="divider-button">Divider</button>
-			<button id="image-button">Image</button>
-			<button id="video-button">Video</button>
-		</span>
-	</div>
 	<div class="row">
+		<div id="sidebar-controls" class='col-sm-8 col-sm-offset-2' style='visibility: hidden'>
+	<!-- 		<button id="show-controls">show control</i></button> -->
+			<span class="controls">
+				<button id="divider-button" class="btn btn-primary">Divider</button>
+				<button id="image-button" class="btn btn-primary">Image</button>
+				<button id="video-button" class="btn btn-primary">Video</button>
+			</span>
+		</div>
+
 		<div class='col-xs-12 col-sm-8 col-sm-offset-2'>
 			<p id='contentErr' class='err'>Content is empty</p>
 			<article id="editor-container" ></article>
@@ -137,6 +155,15 @@
 		var pid = "{{ instance.id }}";
 		var imgUpdate = 1;
 	</script>
+{% if instance.draft %}
+	<script>
+		var draft = true;
+	</script>
+{% else %}
+	<script>
+		var draft = false;
+	</script>
+{% endif %}
 	<script src='{% static "js/post_form.js" %}'></script>
 	<script src='{% static "js/post_update.js" %}'></script>
 {% else %}
@@ -147,4 +174,4 @@
 	<script src='{% static "js/post_create.js" %}'></script>
 {% endif %}
 
-{% endblock%}
+{% endblock %}

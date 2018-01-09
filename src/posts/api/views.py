@@ -80,6 +80,7 @@ class PostDeleteAPIView(DestroyAPIView):
 	serializer_class = PostDetailSerializer
 	lookup_field = 'id'
 	permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+	authentication_classes = [SessionAuthentication]
 
 class PostListAPIView(ListAPIView):
 	serializer_class = PostListSerializer
