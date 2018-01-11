@@ -44,7 +44,11 @@
 					<tr>
 						<td><h3>Private: </h3></td>
 						<td>
+							{% if instance.private %}
+							<input type="checkbox" id="private" checked>
+							{% else %}
 							<input type="checkbox" id="private">
+							{% endif %}
 							<br>
 						</td>
 					</tr>

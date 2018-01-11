@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import (
 	authenticate,
 	get_user_model,
@@ -6,25 +7,67 @@ from django.contrib.auth import (
 	)
 from django.shortcuts import render, redirect
 
-from .forms import UserLoginForm
-from .forms import UserRegisterForm
+# from .forms import UserLoginForm
+# from .forms import UserRegisterForm
+from .forms import UserForm
+from profiles.models import Profile
+
+from registration.backends.default.views import RegistrationView
 
 # Create your views here.
 
-def login_view(request):
-	next = request.GET.get('next')
-	title = "Login"
-	form = UserLoginForm(request.POST or None)
-	if form.is_valid():
-		username = form.cleaned_data.get("username")
-		password = form.cleaned_data.get("password")
-		user = authenticate(username=username, password=password)
-		login(request, user)
-		if next:
-			return redirect(next)
-		return redirect("/")
+ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS = getattr(settings, 'ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS', True)
 
-	return render(request, "form.html", {"form":form, "title":title})
+
+class MyRegistrationView(RegistrationView):
+	form_class = UserForm
+
+	def dispatch(self, request, *args, **kwargs):
+		"""
+        Check that user signup is allowed and if user is logged in before even bothering to
+        dispatch or do other processing.
+        """
+		if ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS:
+			if self.request.user.is_authenticated:
+				if settings.LOGIN_REDIRECT_URL is not None:
+					return redirect(settings.LOGIN_REDIRECT_URL)
+				else:
+					raise Exception((
+						'You must set a URL with LOGIN_REDIRECT_URL in '
+						'settings.py or set '
+						'ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS=False'))
+
+		if not self.registration_allowed():
+		    return redirect(self.disallowed_url)
+		return super(RegistrationView, self).dispatch(request, *args, **kwargs)
+
+	def get_success_url(self, user):
+		return '/posts/list/'
+
+	def register(self, form_class):
+		new_user = super(MyRegistrationView, self).register(form_class)
+		first_name = form_class.cleaned_data['first_name']
+		last_name = form_class.cleaned_data['last_name']
+		bio = form_class.cleaned_data['bio']
+		avatar = form_class.cleaned_data['avatar']
+		new_profile = Profile.objects.create(user=new_user, bio=bio, avatar=avatar)
+		new_profile.save()
+		return new_user
+
+# def login_view(request):
+# 	next = request.GET.get('next')
+# 	title = "Login"
+# 	form = UserLoginForm(request.POST or None)
+# 	if form.is_valid():
+# 		username = form.cleaned_data.get("username")
+# 		password = form.cleaned_data.get("password")
+# 		user = authenticate(username=username, password=password)
+# 		login(request, user)
+# 		if next:
+# 			return redirect(next)
+# 		return redirect("/")
+
+# 	return render(request, "form.html", {"form":form, "title":title})
 
 def register_view(request):
 	title = "Register"
@@ -48,7 +91,6 @@ def register_view(request):
 	}
 	return render(request, "form.html", context)
 
-def logout_view(request):
-	logout(request)
-	return redirect("/")
-	
+# def logout_view(request):
+# 	logout(request)
+# 	return redirect("/../")

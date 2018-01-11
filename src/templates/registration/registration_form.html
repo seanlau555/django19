@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="row">
+	<div class="col-sm-8 col-sm-offset-2">
+		<h1>Register</h1>
+		<form method="post" id="register">
+			{% csrf_token %}
+			<table class="table">
+				<col width="20%">
+				<col width="80%">
+				<tbody>
+					<tr>
+						<td colspan="2">
+							{{ form.username.errors }}
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="{{ form.username.id_for_label }}">Username:</label>
+						</th>
+						<td>
+							{{ form.username }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.username.help_text }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.email.errors }}
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="{{ form.email.id_for_label }}">Email:</label>
+						</th>
+						<td>
+							{{ form.email }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.email.help_text }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.password1.errors }}
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="{{ form.password1.id_for_label }}">Password:</label>
+						</th>
+						<td>
+							{{ form.password1 }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.password1.help_text|safe }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.password2.errors }}
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="{{ form.password2.id_for_label }}">Confirm Pasword:</label>
+						</th>
+						<td>
+							{{ form.password2 }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.password2.help_text }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.first_name.errors }}
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="{{ form.first_name.id_for_label }}">First name:</label>
+						</th>
+						<td>
+							{{ form.first_name }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.first_name.help_text }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.last_name.errors }}
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="{{ form.last_name.id_for_label }}">Last name:</label>
+						</th>
+						<td>
+							{{ form.last_name }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.last_name.help_text }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.bio.errors }}
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="{{ form.bio.id_for_label }}">Bio:</label>
+						</th>
+						<td>
+							{{ form.bio }}
+							<article id="bio-container" style="width: 100%"></article>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.bio.help_text }}
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.avatar.errors }}
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="{{ form.avatar.id_for_label }}">Avatar:</label>
+						</th>
+						<td>
+							{{ form.avatar }}
+						    <div class="imageBox">
+						        <div class="thumbBox"></div>
+						        <div class="spinner" style="display: none">Loading...</div>
+						    </div>
+						    <div class="action">
+						        <input type="file" id="file" class="btn" style="float:left; width: 250px">
+						        <input type="button" id="btnZoomIn" class="btn" value="+" style="float: right">
+						        <input type="button" id="btnZoomOut" class="btn" value="-" style="float: right">
+						    </div>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							{{ form.avatar.help_text }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+		<button class="btn btn-primary" id="submit">Register</button>
+	</div>
+</div>
+
+	<div class="modal fade" id="loadingModal" role="load">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Registration Process</h4>
+				</div>
+				<div class="modal-body">
+					<p>Loading...</p>
+				</div>
+				<div class="modal-footer">
+					<p>Please do not close the window</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<link rel="stylesheet" href='{% static "css/cropper.css" %}' type="text/css" />
+
+<script src='{% static "js/cropper.js" %}'></script>
+<script src='{% static "js/registration_form.js" %}'></script>
+{% endblock %}

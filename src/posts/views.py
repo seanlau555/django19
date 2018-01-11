@@ -19,9 +19,6 @@ def post_home(request):
 	return render(request, "base.html")
 
 def post_create(request):
-
-	print (request.user)
-
 	# if not request.user.is_staff or not request.user.is_superuser:
 	# 	raise Http404
 
@@ -170,6 +167,8 @@ def post_delete(request, id=None):
 
 def post_draft(request):
 	today = timezone.now().date()
+	if not request.user.is_authenticated:
+		raise Http404
 	queryset_list = Post.objects.all().filter(user=request.user) # .filter(draft=False).filter(publish__lte=timezone.now())
 	if request.user.is_staff or request.user.is_superuser:
 		queryset_list = Post.objects.all().filter(user=request.user)

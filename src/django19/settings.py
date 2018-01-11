@@ -31,6 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'crispy_forms',
+    'registration',
+    'markdown_deux',
+    'pagedown',
+    'rest_framework',
+
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,14 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-
-    'crispy_forms',
-    'registration',
-    'markdown_deux',
-    'pagedown',
-    'rest_framework',
-
     
+    'profiles',
     'comments',
     'posts',
     'files',
@@ -165,3 +166,12 @@ REST_FRAMEWORK = {
         #'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     )
 }
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+
+ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS = True
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_AUTO_LOGIN = True
+LOGIN_REDIRECT_URL = '/posts/list/'
+LOGOUT_REDIRECT_URL = '/posts/list/'

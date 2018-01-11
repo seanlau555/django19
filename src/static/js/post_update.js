@@ -115,7 +115,6 @@
             if (($('#title').val())&&($('#publish').val())&&(publish)&&($('.featureImg').find('img').length > 0)&&!(quill.getText().trim().length === 0)){
                 dataPreparation();
                 data.set('draft', false);
-                data.set('published', true);
                 data.set('content_display', strcontent);
 
 
