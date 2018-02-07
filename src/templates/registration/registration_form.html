@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block theme %}
+<link rel="stylesheet" href='{% static "css/registration_form.css" %}'>
+{% endblock %}
+
 {% block content %}
 <div class="row">
 	<div class="col-sm-8 col-sm-offset-2">
@@ -126,13 +130,19 @@
 					</tr>
 					<tr>
 						<th>
-							<label for="{{ form.bio.id_for_label }}">Bio:</label>
+							<label for="{{ form.bio.id_for_label }}">Biography:</label>
 						</th>
-						<td>
-							{{ form.bio }}
-							<article id="bio-container" style="width: 100%"></article>
-						</td>
 					</tr>
+				</tbody>
+			</table>
+
+			{{ form.bio }}
+			<div id="editor-container"></div>
+
+			<table>
+				<col width="20%">
+				<col width="80%">
+				<tbody>
 					<tr>
 						<td colspan="2">
 							{{ form.bio.help_text }}
@@ -191,5 +201,6 @@
 <link rel="stylesheet" href='{% static "css/cropper.css" %}' type="text/css" />
 
 <script src='{% static "js/cropper.js" %}'></script>
+<script src='{% static "js/custom_quill.js" %}'></script>
 <script src='{% static "js/registration_form.js" %}'></script>
 {% endblock %}

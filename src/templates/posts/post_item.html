@@ -1,16 +1,23 @@
-<div class="card">
-    {% if post.image %}
-        <a href="{{ post.get_absolute_url }}">
-            <img src='{{ post.image }}' height="250" width="275" style="
-            object-fit:cover;
-			-webkit-mask-image:-webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)))"/>
-        </a>
-    {% endif %}
-    <div class="postInfo">
-        <h3>
-        	<a href= '{{ post.get_absolute_url }}'>{{ post.title }}</a>
-        	<p><small>{{ post.publish }}</small></p>
-        </h3>
-        <p>{{ post.user.get_full_name }}</p>
+    <div class="card">
+        {% if post.image %}
+        <div>
+            <img src='{{ post.image }}' class="feature"/>
+        </div>
+        {% endif %}
+        <div class="postInfo">
+            <div class="title">
+                <h3>
+                    <a href= '{{ post.get_absolute_url }}'>
+                        <p class="titleText" data-toggle="tooltip" data-placement="top" title="{{ post.title }}" data-delay='{"show":"1000", "hide":"1000"}'>{{ post.title }}</p>
+                    </a>
+                	<p><small>{{ post.publish }}</small></p>
+                </h3>
+            </div>
+            <div class="author">
+                <img src="{{ post.user.profile.avatar }}" class="posticon"></img>
+                <a href="{% url 'accounts:profile' post.user.username %}">
+                    <span class="author">{{ post.user.get_full_name }}</span>
+                </a>
+            </div>
+        </div>
     </div>
-</div>

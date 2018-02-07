@@ -25,9 +25,13 @@ from rest_framework.permissions import (
     IsAdminUser,
     IsAuthenticatedOrReadOnly,
     )
+from rest_framework.authentication import SessionAuthentication
 
-from posts.api.permissions import IsOwnerOrReadOnly
+from accounts.api.serializers import UserUpdateSerializer, ProfileUpdateSerializer
+
+from accounts.api.permissions import IsUserOrReadOnly, IsOwnerOrReadOnly
 from posts.api.pagination import PostLimitOffsetPagination, PostPageNumberPagination
+from profiles.models import Profile
 
 User = get_user_model()
 
@@ -52,3 +56,17 @@ class UserLoginAPIView(APIView):
 			new_data = serializer.data
 			return Response(new_data, status=HTTP_200_OK)
 		return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+class UserUpdateAPIView(RetrieveUpdateAPIView):
+	queryset = User.objects.all()
+	serializer_class = UserUpdateSerializer
+	lookup_field = 'id'
+	permission_classes = [IsAuthenticatedOrReadOnly, IsUserOrReadOnly]
+	authentication_classes = [SessionAuthentication]
+
+class ProfileUpdateAPIView(RetrieveUpdateAPIView):
+	queryset = Profile.objects.all()
+	serializer_class = ProfileUpdateSerializer
+	lookup_field = 'id'
+	permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+	authentication_classes = [SessionAuthentication]

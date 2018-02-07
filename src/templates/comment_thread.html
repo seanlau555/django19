@@ -1,36 +1,36 @@
 {% extends "base.html" %}
 {% load urlify %}
+{% load staticfiles %}
 {% load crispy_forms_tags %}
 
 {% block head_title %}
 {{ comment.content }} | {{ block.super }}
 {% endblock head_title %}
 
-<style>
-{% block style %}
-	h1{
-		color: #008800;
-	}
+{% block theme %}
+	<link rel="stylesheet" href='{% static "css/comment_thread.css" %}'>
 {% endblock %}
-</style>
 
 {% block content %}
 
-<div class='col-sm-6 col-sm-offset-3'>
-	<p>
-		<!-- Post name: {{ comment.content_object }}<br> -->{{ comment.content }}
-	</p>
-	<footer class="blockquote-footer"> {{ comment.user }} | {{ comment.timestamp|timesince }} ago | {% if comment.children.count > 0 %}{{ comment.children.count }} comment{% if comment.children.count > 1 %}s{% endif %} | {% endif %}{% if request.user == comment.user %} <a href="{{ comment.get_delete_url }}">Delete</a>{% endif %}</footer>
+<div id="commentBody" class='col-sm-6 col-sm-offset-3'>
+	<h2>{{ comment.user.get_full_name }}: </h2>
+	<div id="main-comment-body">
+		<h3>
+			<!-- Post name: {{ comment.content_object }}<br> -->{{ comment.content }}
+		</h3>
+	</div>
+	<footer class="blockquote-footer">{{ comment.timestamp|timesince }} ago{% if comment.children.count > 0 %} | {{ comment.children.count }} comment{% if comment.children.count > 1 %}s{% endif %} | {% endif %}{% if request.user == comment.user %} <a href="{{ comment.get_delete_url }}">Delete</a>{% endif %}</footer>
 
 	<hr>
 
 	<div>
 {% for child_comment in comment.children %}
-		<blockquote>
+		<blockquote class="child-comment">
 			<p>
 				<!-- Post name: {{ comment.content_object }}<br> -->{{ child_comment.content }}
 			</p>
-			<footer class="blockquote-footer"> {{ child_comment.user }} | {{ child_comment.timestamp|timesince }} ago{% if request.user == child_comment.user %} | <a href="{{ child_comment.get_delete_url }}">Delete</a>{% endif %}</footer></footer>
+			<footer class="blockquote-footer"> {{ child_comment.user.get_full_name }} | {{ child_comment.timestamp|timesince }} ago{% if request.user == child_comment.user %} | <a href="{{ child_comment.get_delete_url }}">Delete</a>{% endif %}</footer></footer>
 		</blockquote>
 {% endfor %}
 

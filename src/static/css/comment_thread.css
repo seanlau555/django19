@@ -1,0 +1,15 @@
+#commentBody {
+	margin-top: 10px;
+}
+
+#main-comment-body {
+	margin-left: 20px;
+}
+
+.blockquote-footer {
+	text-align: right;
+}
+
+.child-comment {
+	margin-left: 20px;
+}

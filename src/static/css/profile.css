@@ -1,0 +1,49 @@
+#avatar {
+	width: 100px;
+	vertical-align: middle;
+}
+
+table {
+	width: 100%;
+	margin-top: 20px;
+}
+
+#first, #last {
+	display: inline-block;
+	position: relative;
+	height: 35.2px;
+	min-width: 10px;
+}
+
+[contenteditable]:focus {
+    outline: 0px solid transparent;
+}
+
+input {
+	border: none !important;
+}
+
+.avatarTag {
+    padding-bottom: 75px;
+	text-align: center;
+}
+
+#avatar {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#email {
+	height: 100%;
+}
+
+#biography {
+	text-align: center;
+}
+
+#editor-container {
+	width: 100%;
+	height: 200px;
+	margin-bottom: 12px;
+}

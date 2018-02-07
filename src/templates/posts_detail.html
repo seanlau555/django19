@@ -15,6 +15,7 @@
 {{ form.media }}
 	<link rel="stylesheet" href='{% static "css/quill.core.min.css" %}'>
 	<link rel="stylesheet" href='{% static "css/editor.css" %}'>
+	<link rel="stylesheet" href='{% static "css/post_detail.css" %}'>
 {% endblock %}
 
 {% block head_extra %}
@@ -22,185 +23,111 @@
 {% endblock head_extra %}
 
 {% block content %}
-<div class='col-sm-8 col-sm-offset-2'>
 {% if instance.image %}
-	<img src='{{ instance.image }}' class='img-responsive'/>
+<img src='{{ instance.image }}' class='img-responsive feature'/>
 {% endif %}
+<div class="container">
+	<div class='col-sm-8 col-sm-offset-2'>
+		<div id="info">
+			<h1><b>{{ title }}</b><br><small>{{ instance.publish }}</small></h1>
+			<h2>last updated: {{ instance.updated|timesince }}</h2>
+			<h3>
+				<img src="{{ instance.user.profile.avatar }}" id="avatar" class="img-circle"/>
+				<a href="{% url 'accounts:profile' instance.user.username %}">
+					{{ instance.user.get_full_name}}
+				</a>
+			</h3>
 
-	<h1>{{ title }}<br>{{ instance.publish }}</small></h1>
+			<small>Estimated read time:{% if instance.read_time <= 1 %} <1 minute {% else %} {{ instance.read_time }} minutes {% endif %}</small>
 
-	<p>Read time:{% if instance.read_time <= 1 %} <1 minute {% else %} {{ instance.read_time }} minutes {% endif %}</p>
-	<p>
-		Author: {{ instance.user }}
-{% if instance.user.get_full_name %}
-		aka {{ instance.user.get_full_name}}
-{% endif %}
-	</p>
+			<p>
+				{% if request.user == instance.user %}
+				<h4><a href='{{ instance.get_absolute_url }}edit/'>Edit this post</a></h4>
+				{% endif %}
+				<br>
+				<!--  	<a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_url }}/">
+				Facebook
+				</a>
 
-	<p>
-		<a href='{{ instance.get_absolute_url }}edit/'>Edit</a>
+				<a href="https://twitter.com/home?status={{ instance.content|urlify }}%20{{ request.build_absolute_url }}">
+				Twitter
+				</a>
 
-		<div class="fb-like" data-href="{{ request.build_absolute_url }}" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+				<a href='https://plus.google.com/share?url={{ request.build_absolute_url }}'>
+				Google Plus
+				</a>
 
-		<br>
+				<a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_url }}&title={{ instance.title }}&summary={{ share_string }}%20{{ request.build_absolute_url }}">
+				Linkedin
+				</a>
 
-<!--  	<a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_url }}/">
-Facebook
-</a>
-
-<a href="https://twitter.com/home?status={{ instance.content|urlify }}%20{{ request.build_absolute_url }}">
-Twitter
-</a>
-
-<a href='https://plus.google.com/share?url={{ request.build_absolute_url }}'>
-Google Plus
-</a>
-
-<a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_url }}&title={{ instance.title }}&summary={{ share_string }}%20{{ request.build_absolute_url }}">
-Linkedin
-</a>
-
-<a href="http://www.reddit.com/submit?url={{ request.build_absolute_url }}&title={{ instance.title }}">Reddit</a> -->
-	</p>
-
-	<div class='col-sm-12'>
-
-		<h2>last updated: {{ instance.updated|timesince }}</h2>
-
-		<div id='detail'></div>
-<!-- 		<div class='post-detail-item'>{{ instance.get_markdown  }}</div> -->
-
-		Post ID: {{ instance.id }}
-		<hr><br>
-
-		<div>
-			<p class='lead'>Comments</p>
-{% if request.user.is_authenticated %}
-			<form method='POST' action='.'>{{ comment_form|crispy }} {% csrf_token %}
-				<input type='submit' value='Post comment' class='btn btn-default'> 
-			</form>
-{% else %}
-			<p>You must login to comment on the post</p>
-{% endif %}
-			<hr>
-{% for comment in comments %}
-
-			<blockquote>
-				<p>
-					<!-- Post name: {{ comment.content_object }}<br> -->{{ comment.content }}
-				</p>
-				<footer class="blockquote-footer"> {{ comment.user }} | {{ comment.timestamp|timesince }} ago | {% if comment.children.count > 0 %}{{ comment.children.count }} comment{% if comment.children.count > 1 %}s{% endif %} | {% endif %}<a class= 'comment-reply-btn' href='#'>Reply</a> | <a class= '' href='{{ comment.get_absolute_url }}'>Thread</a></footer>
-
-				<div class='comment-reply'>
-{% for child_comment in comment.children %}
-					<blockquote>
-						<p>
-							<!-- Post name: {{ comment.content_object }}<br> -->{{ child_comment.content }}
-						</p>
-						<footer class="blockquote-footer"> {{ child_comment.user }} | {{ child_comment.timestamp|timesince }} ago</footer>
-					</blockquote>
-{% endfor %}
-
-{% if request.user.is_authenticated %}
-					<form method='POST' action='.'>{% csrf_token %}{{ comment_form|crispy }}
-						<input type='hidden' name='parent_id' value='{{ comment.id }}'>
-						<input type='submit' value='Reply' class='btn btn-default'> 
-					</form>
-{% else %}
-					<p>Login is required</p>
-{% endif %}
-				</div>
-			</blockquote>
-
-{% endfor %}
-<!-- 			{{ instance.comment_set.all }} -->
+				<a href="http://www.reddit.com/submit?url={{ request.build_absolute_url }}&title={{ instance.title }}">Reddit</a> -->
+			</p>
 		</div>
 
-		<!-- <div class="fb-comments" data-href="{{ request.build_absolute_url }}" data-numposts="5"></div> -->
+		<div class='col-sm-12'>
+			<div id='editor-container'></div>
+	<!-- 		<div class='post-detail-item'>{{ instance.get_markdown  }}</div> -->
+
+			Post ID: {{ instance.id }}
+			</br>
+			<div class="fb-like" data-href="{{ request.build_absolute_url }}" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+			<hr>
+
+			<div>
+	{% for comment in comments %}
+
+				<blockquote>
+					<p>
+						<!-- Post name: {{ comment.content_object }}<br> -->{{ comment.content }}
+					</p>
+					<footer class="blockquote-footer"> {{ comment.user.get_full_name }} | {{ comment.timestamp|timesince }} ago | {% if comment.children.count > 0 %}{{ comment.children.count }} comment{% if comment.children.count > 1 %}s{% endif %} | {% endif %}<a href='{{ comment.get_absolute_url }}'>Thread</a></footer>
+
+					<div class='comment-reply'>
+	{% for child_comment in comment.children %}
+						<blockquote>
+							<p>
+								<!-- Post name: {{ comment.content_object }}<br> -->{{ child_comment.content }}
+							</p>
+							<footer class="blockquote-footer"> {{ child_comment.user }} | {{ child_comment.timestamp|timesince }} ago</footer>
+						</blockquote>
+	{% endfor %}
+
+	{% if request.user.is_authenticated %}
+						<form method='POST' action='.'>{% csrf_token %}{{ comment_form|crispy }}
+							<input type='hidden' name='parent_id' value='{{ comment.id }}'>
+							<input type='submit' value='Reply' class='btn btn-default'> 
+						</form>
+	{% else %}
+						<p>Login is required</p>
+	{% endif %}
+					</div>
+				</blockquote>
+
+	{% endfor %}
+				<hr>
+				<p class='lead'>Comments</p>
+				{% if request.user.is_authenticated %}
+				<form method='POST' action='.'>{{ comment_form|crispy }} {% csrf_token %}
+					<input type='submit' value='Post comment' class='btn btn-default'> 
+				</form>
+				{% else %}
+				<p>You must login to comment on the post</p>
+				{% endif %}
+	<!-- 			{{ instance.comment_set.all }} -->
+			</div>
+
+			<!-- <div class="fb-comments" data-href="{{ request.build_absolute_url }}" data-numposts="5"></div> -->
+		</div>
 	</div>
 </div>
 
+<script src='{% static "js/read_only_quill.js" %}'></script>
 <script>
-		let Inline = Quill.import('blots/inline');
-		let Block = Quill.import('blots/block');
-		let BlockEmbed = Quill.import('blots/block/embed');
-
-		class DividerBlot extends BlockEmbed { }
-		DividerBlot.blotName = 'divider';
-		DividerBlot.tagName = 'hr';
-
-		class ImageBlot extends BlockEmbed {
-			static create(value) {
-				let node = super.create();
-				node.innerHTML = "<img src='"+value.url+"' alt='"+value.alt+"'><br><p style='color: #bbbbbb; font-style: italic;'>"+value.text+"</p><br>";
-				return node;
-			}
-		}
-		ImageBlot.blotName = 'imagewithcaption';
-		ImageBlot.tagName = 'div';
-
-		class YTVideoBlot extends BlockEmbed {
-			static create(url) {
-			let node = super.create();
-			node.setAttribute('src', url);
-			node.setAttribute('frameborder', '0');
-			node.setAttribute('allowfullscreen', true);
-			return node;
-			}
-
-			static formats(node) {
-				let format = {};
-				if (node.hasAttribute('height')) {
-					format.height = node.getAttribute('height');
-				}
-				if (node.hasAttribute('width')) {
-					format.width = node.getAttribute('width');
-				}
-				return format;
-			}
-
-			static value(node) {
-				return node.getAttribute('src');
-			}
-
-			format(name, value) {
-				if (name === 'height' || name === 'width') {
-					if (value) {
-						this.domNode.setAttribute(name, value);
-					} else {
-						this.domNode.removeAttribute(name, value);
-					}
-				} else {
-					super.format(name, value);
-				}
-			}
-		}
-		YTVideoBlot.blotName = 'ytvideo';
-		YTVideoBlot.tagName = 'iframe';
-
-	    class VideoBlot extends BlockEmbed {
-	        static create(value) {
-	            let node = super.create();
-	            node.innerHTML = "<video class='video' preload='auto' autoplay='autoplay' loop='loop' muted='muted'><source src='"+value.url+"'></video><br><p style='color: #bbbbbb; font-style: italic;'>"+value.text+"</p><br>";
-	            return node;
-	        }
-	    }
-	    VideoBlot.blotName = 'videowithcaption';
-	    VideoBlot.tagName = 'div';
-
-		Quill.register(ImageBlot);
-		Quill.register(YTVideoBlot);
-		Quill.register(VideoBlot);
-		Quill.register(DividerBlot);
-
-	var content = new Quill('#detail', {
-		modules: {},
-		scrollingContainer: '#scrolling-container',
-		theme: 'bubble'
-	});
-
-	content.setContents({{ instance.content_display|safe }});
-	content.enable(false);
+	if (typeof {{ instance.content_display|safe }} !== 'undefined'){
+		quill.setContents({{ instance.content_display|safe }});
+	}
+	quill.enable(false);
 </script>
 
 {% endblock %}

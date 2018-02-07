@@ -2,6 +2,24 @@
     margin-top:12px;
 }
 
+.navbar-fixed-top .navbar-collapse {
+    max-height: 1000px;
+}
+
+@media only screen and (max-width:767px) {
+    #search-submit {
+        width: 100%;
+    }
+
+    #user-name {
+        display: none;
+    }
+
+    #greeting {
+        display: none;
+    }
+}
+
 /* .navbar-default .navbar-nav>li>a {
     color: #ffffff;
     font-weight: 400;

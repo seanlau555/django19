@@ -127,7 +127,7 @@
                     data: data,
                     success: function(t) {
                         // var pid=t.id;
-                        location.href = "../../list/"
+                        location.href = "../";
                     },error: function(t) {
                         console.log(t);
                     }

@@ -2,6 +2,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
+from profiles.models import Profile
+
 from rest_framework.serializers import (
     CharField,
     EmailField,
@@ -78,8 +80,8 @@ class UserLoginSerializer(ModelSerializer):
             'token',
         ]
         extra_kwargs = {"password":
-                            {"write_only": True}
-                            }
+            {"write_only": True}
+        }
 
     def validate(self, data):
         user_obj = None
@@ -103,3 +105,20 @@ class UserLoginSerializer(ModelSerializer):
                 raise ValidationError("Incorrect password")
         data["token"] = "SOME RANDOM TOKEN"
         return data
+
+class UserUpdateSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+        ]
+
+class ProfileUpdateSerializer(ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = [
+            'avatar',
+            'bio',
+        ]

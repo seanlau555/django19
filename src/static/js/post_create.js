@@ -153,7 +153,7 @@
                     success: function(t) {
                         // var pid=t.id;
                         console.log(t.id);
-                        location.href = "../list/"
+                        location.href = "../"+pid+"/";
                     },error: function(t) {
                         console.log(t);
                     }

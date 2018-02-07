@@ -3,184 +3,303 @@
 
 {% block content %}
 
-<div class='row'>
-    {% comment %}
-    <h1>{{ title }}</h1>
-	<form method='GET' action='' class='row'>
-		<div class='col-sm-6'>
-			<div class='input-group'>
-				<input class='form-control' type='text' name='q' placeholder='Search Posts' value='{{ request.GET.q }}'/>
-				<span class='input-group-btn'>
-					<!-- <input class='btn btn-default' type='submit' value='search'/> -->
-					<button class='btn btn-default' type='submit'>Search<i class="fa fa-search"></i></button>
-				</span>
-			</div>
-		</div>
-	</form>
-    {% endcomment %}
+{% if title != "My Posts" %}
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#myCarousel" data-slide-to="1"></li>
+        <li data-target="#myCarousel" data-slide-to="2"></li>
+    </ol>
 
-    {% if title == "My Posts" %}
-    <form method='GET' action='' class='col-sm-2' id="filter">
-        <table width="100%">
-            <tr>
-                <input type="hidden" class="form-control" name="q" {% if request.GET.q %}value="{{ request.GET.q }}"{% endif %}>
-                <td colspan='3'>Draft:</td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="radio" class="form-check-input d" name="draft" value="t" id="d1">
-                    <label class="form-check-label" for="d1">
-                        Yes
-                    </label>
-                </td>
-                <td>
-                    <input type="radio" class="form-check-input d" name="draft" value="f" id="d2">
-                    <label class="form-check-label" for="d2">
-                        No
-                    </label>
-                </td>
-                <td>
-                    <input type="radio" class="form-check-input d" name="draft" value="all" id="d3" checked>
-                    <label class="form-check-label" for="d3">
-                        All
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <td colspan='3'>Published:</td>
-            </tr>
-            <tr>
-                <td id="publish">
-                    <input type="radio" class="form-check-input p" name="publish" value="t" id="p1">
-                    <label class="form-check-label" for="p1">
-                        Yes
-                    </label>
-                </td>
-                <td>
-                    <input type="radio" class="form-check-input p" name="publish" value="f" id="p2">
-                    <label class="form-check-label" for="p2">
-                        No
-                    </label>
-                </td>
-                <td>
-                    <input type="radio" class="form-check-input p" name="publish" value="all" id="p3" checked>
-                    <label class="form-check-label" for="p3">
-                        All
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <td colspan='3'>Private:</td>
-            </tr>
-            <tr>
-                <td id="private">
-                    <input type="radio" class="form-check-input pri" name="private" value="t" id="pri1">
-                    <label class="form-check-label" for="pri1">
-                        Yes
-                    </label>
-                </td>
-                <td>
-                    <input type="radio" class="form-check-input pri" name="private" value="f" id="pri2">
-                    <label class="form-check-label" for="pri2">
-                        No
-                    </label>
-                </td>
-                <td>
-                    <input type="radio" class="form-check-input pri" name="private" value="all" id="pri3" checked>
-                    <label class="form-check-label" for="pri3">
-                        All
-                    </label>
-                </td>
-            </tr>
-
-        </table>
-        <button class='btn btn-default' type='submit'>Filter<i class="fa fa-filter"></i></button>
-    </form>
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner">
+    {% for post in carousel_list %}
+    {% if carousel_list.0.id == post.id %}
+        <div class="item active">
+    {% else %}
+        <div class="item">
     {% endif %}
-
-    {% if title != "My Posts" %}
-    <div class="col-sm-10">
-        <div id="myCarousel" class="carousel slide" data-ride="carousel">
-            <!-- Indicators -->
-            <ol class="carousel-indicators">
-                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                <li data-target="#myCarousel" data-slide-to="1"></li>
-                <li data-target="#myCarousel" data-slide-to="2"></li>
-            </ol>
-
-            <!-- Wrapper for slides -->
-            <div class="carousel-inner">
-            {% for post in carousel_list %}
-            {% if carousel_list.0.id == post.id %}
-                <div class="item active">
-            {% else %}
-                <div class="item">
-            {% endif %}
-                    <a href="{{ post.get_absolute_url }}"><img src="{{ post.image }}" alt="{{ post.title }}" style="object-fit: cover; height: 500px; width: 100%;">
-                    <div class="carousel-caption">
-                    <h1><b>{{ post.title }}</b></h1>
-                    </div></a>
-                </div>
-            {% endfor %}
-            </div>
-
-                <!-- Left and right controls -->
-            <a class="left carousel-control" href="#myCarousel" data-slide="prev">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="right carousel-control" href="#myCarousel" data-slide="next">
-                <span class="glyphicon glyphicon-chevron-right"></span>
-                <span class="sr-only">Next</span>
-            </a>
+            <a href="{{ post.get_absolute_url }}"><img src="{{ post.image }}" alt="{{ post.title }}" style="object-fit: cover; height: 500px; width: 100%;">
+            <div class="carousel-caption">
+            <h1><b>{{ post.title }}</b></h1>
+            </div></a>
         </div>
+    {% endfor %}
     </div>
-    {% endif %}
 
-    {% include "posts/posts.html" with object_list=object_list col_class_set="col-sm-4" %}
-    
-	<div class="col-sm-10 pagination">
-		<span class="step-links">
-            {% if object_list.has_previous %}
-                <a href="?{{page_request_var}}={{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.draft %}&draft={{ request.GET.draft }}{% endif %}{% if request.GET.publish %}&publish={{ request.GET.publish }}{% endif %}"><button class='btn btn-info'>previous</button></a>
-            {% else %}
-                <button class='btn btn-info' disabled>previous</button>
-            {% endif %}
-                <span class="current">
-                    Page {{ object_list.number }} of {{ object_list.paginator.num_pages }}.
-                </span>
-            {% if object_list.has_next %}
-                <a href="?{{page_request_var}}={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.draft %}&draft={{ request.GET.draft }}{% endif %}{% if request.GET.publish %}&publish={{ request.GET.publish }}{% endif %}"><button class='btn btn-info'>next</button></a>
-            {% else %}
-                <button class='btn btn-info' disabled>next</button>
-            {% endif %}
-		</span>
-	</div>
+    <!-- Left and right controls -->
+    <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+        <span class="sr-only">Next</span>
+    </a>
 </div>
+<div class="main-text hidden-xs">
+    <div class="col-md-12 text-center">
+        <h1>
+            <b>Welcome to Sparktake</b>
+        </h1>
+        <h3>
+            <b>Newest Stories</b>
+        </h3>
+    </div>
+</div>
+{% endif %}
 
-<script src='{% static "js/post_list.js" %}'></script>
-{% endblock %}
+<div class='container' id='content'>
+    <div class='row'>
+        {% comment %}
+        <h1>{{ title }}</h1>
+    	<form method='GET' action='' class='row'>
+    		<div class='col-sm-6'>
+    			<div class='input-group'>
+    				<input class='form-control' type='text' name='q' placeholder='Search Posts' value='{{ request.GET.q }}'/>
+    				<span class='input-group-btn'>
+    					<!-- <input class='btn btn-default' type='submit' value='search'/> -->
+    					<button class='btn btn-default' type='submit'>Search<i class="fa fa-search"></i></button>
+    				</span>
+    			</div>
+    		</div>
+    	</form>
+        {% endcomment %}
+        <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+            <i class="glyphicon glyphicon-align-left"></i>
+            Toggle Sidebar
+        </button>
+        {% if title == "My Posts" %}
+        <div class="wrapper">
+            <nav id="sidebar">
+                <div class="sidebar-header">
+                    <h3>Settings</h3>
+                </div>
 
-{% comment %}
-{% for obj in object_list %}
-<div class="row">
-    <div class='col-sm-12'>
-        <div class="thumbnail">
-            {% if obj.image %}
-                <img src='{{ obj.image.url }}' class='img-responsive'/>
-            {% endif %}
-                <div class="caption post-detail-item">
-            {% if obj.draft %}
-                <h3 style='color:red'>Draft</h3>
-            {% endif %}
-            {% if obj.publish > today %}
-                <h3>Future Post</h3>
-    
-                <h3><a href= '{{ obj.get_absolute_url }}'>{{ obj.title }}</a> 	<small><!-- {{ obj.timestamp|timesince }} ago -->{{ obj.publish }}</small></h3>
-                <p>Author: {{ obj.user.get_full_name }}</p>
-            {% endif %}
-                <div id='{{ obj.slug }}'></div>
-                <p><a href='{{ obj.get_absolute_url }}' class="btn btn-primary" role="button">View</a></p>
+                <ul class="list-unstyled components">
+                    <p>Dummy Heading</p>
+                    <li class="active">
+                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">Home</a>
+                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                            <li><a href="#">Home 1</a></li>
+                            <li><a href="#">Home 2</a></li>
+                            <li><a href="#">Home 3</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">About</a>
+                        <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false">Pages</a>
+                        <ul class="collapse list-unstyled" id="pageSubmenu">
+                            <li><a href="#">Page 1</a></li>
+                            <li><a href="#">Page 2</a></li>
+                            <li><a href="#">Page 3</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">Portfolio</a>
+                    </li>
+                    <li>
+                        <a href="#">Contact</a>
+                    </li>
+                </ul>
+
+                <ul class="list-unstyled CTAs">
+                    <li><a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a></li>
+                    <li><a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Custom Scroller Js CDN -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+        <script src='{% static "js/settings.js" %}'></script>
+        {% if is_user %}
+        <div class="filter col-sm-2">
+            <button data-toggle="collapse" data-target="#collapse" class='btn btn-primary' id="filterCollapse">Filter<i class="fa fa-filter"></i></button>
+
+            <div id="collapse" class="collapse">
+                <form method='GET' action='' id="filter">
+                    <table width="100%">
+                        <tr>
+                            <input type="hidden" class="form-control" name="q" {% if request.GET.q %}value="{{ request.GET.q }}"{% endif %}>
+                            <td colspan='3'><h4>Draft:</h4></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class="form-check-label" for="d1">
+                                    Yes
+                                </label>
+                            </td>
+                            <td>
+                                <label class="form-check-label" for="d2">
+                                    No
+                                </label>
+                            </td>
+                            <td>
+                                <label class="form-check-label" for="d3">
+                                    All
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="d1">
+                                    <input type="radio" class="form-check-input d" name="draft" value="t" id="d1">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="d2">
+                                    <input type="radio" class="form-check-input d" name="draft" value="f" id="d2">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="d3">
+                                    <input type="radio" class="form-check-input d" name="draft" value="all" id="d3" checked>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan='3'><h4>Published:</h4></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class="form-check-label" for="p1">
+                                    Yes
+                                </label>
+                            </td>
+                            <td>
+                                <label class="form-check-label" for="p2">
+                                    No
+                                </label>
+                            </td>
+                            <td>
+                                <label class="form-check-label" for="p3">
+                                    All
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="p1">
+                                    <input type="radio" class="form-check-input p" name="publish" value="t" id="p1">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="p2">
+                                    <input type="radio" class="form-check-input p" name="publish" value="f" id="p2">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="p3">
+                                    <input type="radio" class="form-check-input p" name="publish" value="all" id="p3" checked>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan='3'><h4>Private:</h4></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class="form-check-label" for="pri1">
+                                    Yes
+                                </label>
+                            </td>
+                            <td>
+                                <label class="form-check-label" for="pri2">
+                                    No
+                                </label>
+                            </td>
+                            <td>
+                                <label class="form-check-label" for="pri3">
+                                    All
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="pri1">
+                                    <input type="radio" class="form-check-input pri" name="private" value="t" id="pri1">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="pri2">
+                                    <input type="radio" class="form-check-input pri" name="private" value="f" id="pri2">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                            <td class="radiotd">
+                                <label class="form-check-label" for="pri3">
+                                    <input type="radio" class="form-check-input pri" name="private" value="all" id="pri3" checked>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button id="filterButton" class='btn btn-primary' type='submit'>Confirm</i></button>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div> 
+        {% endif %}
+        {% endif %}
+
+        {% include "posts/posts.html" with object_list=object_list col_class_set="col-sm-4" %}
+        
+    	<div class="col-sm-offset-2 col-sm-10 paginator">
+    		<span class="step-links">
+                {% if object_list.has_previous %}
+                    <a href="?{{page_request_var}}={{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.draft %}&draft={{ request.GET.draft }}{% endif %}{% if request.GET.publish %}&publish={{ request.GET.publish }}{% endif %}"><button class='btn btn-primary'>previous</button></a>
+                {% else %}
+                    <button class='btn btn-primary' disabled>previous</button>
+                {% endif %}
+                    <span class="current">
+                        Page {{ object_list.number }} of {{ object_list.paginator.num_pages }}.
+                    </span>
+                {% if object_list.has_next %}
+                    <a href="?{{page_request_var}}={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.draft %}&draft={{ request.GET.draft }}{% endif %}{% if request.GET.publish %}&publish={{ request.GET.publish }}{% endif %}"><button class='btn btn-primary'>next</button></a>
+                {% else %}
+                    <button class='btn btn-primary' disabled>next</button>
+                {% endif %}
+    		</span>
+    	</div>
+    </div>
+
+    <script src='{% static "js/post_list.js" %}'></script>
+    {% endblock %}
+
+    {% comment %}
+    {% for obj in object_list %}
+    <div class="row">
+        <div class='col-sm-12'>
+            <div class="thumbnail">
+                {% if obj.image %}
+                    <img src='{{ obj.image.url }}' class='img-responsive'/>
+                {% endif %}
+                    <div class="caption post-detail-item">
+                {% if obj.draft %}
+                    <h3 style='color:red'>Draft</h3>
+                {% endif %}
+                {% if obj.publish > today %}
+                    <h3>Future Post</h3>
+        
+                    <h3><a href= '{{ obj.get_absolute_url }}'>{{ obj.title }}</a> 	<small><!-- {{ obj.timestamp|timesince }} ago -->{{ obj.publish }}</small></h3>
+                    <p>Author: {{ obj.user.get_full_name }}</p>
+                {% endif %}
+                    <div id='{{ obj.slug }}'></div>
+                    <p><a href='{{ obj.get_absolute_url }}' class="btn btn-primary" role="button">View</a></p>
+                </div>
             </div>
         </div>
     </div>

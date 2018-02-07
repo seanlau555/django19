@@ -49,7 +49,7 @@ class Comment(models.Model):
 	objects = CommentManager()
 
 	class Meta:
-		ordering = ['-timestamp']
+		ordering = ['timestamp']
 
 	def __unicode__(self):
 		return str(self.user.username)

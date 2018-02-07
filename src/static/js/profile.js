@@ -1,12 +1,18 @@
-setInterval(function(){
-    jscontent = quill.getContents();
-    strcontent = JSON.stringify(jscontent.ops);
-	$("#id_bio").val(strcontent);
-}, 100);
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+if(IsJsonString($("#bio-text").html())){
+    console.log(JSON.parse($("#bio-text").html()));
+    quill.setContents(JSON.parse($("#bio-text").html()));
+}
 
 window.onload = function() {
-	$("input").addClass("form-control");
-
     // setup session cookie data. This is Django-related
     function getCookie(name) {
         var cookieValue = null;
@@ -45,9 +51,6 @@ window.onload = function() {
         imgSrc: 'avatar.png'
     }
     var cropper;
-    document.querySelector('#file').classList.remove("form-control");
-    document.querySelector('#btnZoomIn').classList.remove("form-control");
-    document.querySelector('#btnZoomOut').classList.remove("form-control");
 
     document.querySelector('#file').addEventListener('change', function(){
         var reader = new FileReader();
@@ -58,7 +61,7 @@ window.onload = function() {
         reader.readAsDataURL(this.files[0]);
         this.files = [];
     })
-    document.querySelector('#submit').addEventListener('click', function(){
+    document.querySelector('#crop').addEventListener('click', function(){
         $("#loadingModal").modal({backdrop: "static"});
         var avatar = cropper.getBlob();
         avatar.name = document.getElementById("file").files[0].name
@@ -72,6 +75,13 @@ window.onload = function() {
         cropper.zoomOut();
     })
 };
+
+$("#first").blur(function() {
+    $("#fname").val($("#first").html());
+})
+$("#last").blur(function() {
+    $("#lname").val($("#last").html());
+})
 
 function constructFormPolicyData(policyData, fileItem) {
     var contentType = fileItem.type != '' ? fileItem.type : 'application/octet-stream'
@@ -104,8 +114,8 @@ function fileUploadComplete(fileItem, policyData){
         url: "/api/files/complete/",
         success: function(successdata){
             imgurl = policyData.url + policyData.file_bucket_path + policyData.filename;
-            $("#id_avatar").val(imgurl);
-            $("#register").submit();
+            $("#avatar").attr("src", imgurl);
+            $("#myModal").modal("hide");
         },
         error: function(jqXHR, textStatus, errorThrown){ 
         	console.log(errorThrown);
@@ -159,6 +169,41 @@ function uploadFile(fileItem){
         })
 };
 
+$(document).ready(function(){
+    // setup session cookie data. This is Django-related
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+    // end session cookie data setup.
+
+    $("#first").html($("#fname").val());
+    $("#last").html($("#lname").val());
+});
+
 $(".imageBox").mouseenter(function(){
     document.onmousewheel = function(){ stopWheel(); } /* IE7, IE8 */
     if(document.addEventListener){ /* Chrome, Safari, Firefox */
@@ -169,10 +214,63 @@ $(".imageBox").mouseenter(function(){
     if(document.addEventListener){ /* Chrome, Safari, Firefox */
         document.removeEventListener('DOMMouseScroll', stopWheel, false);
     }
-})
+});
 
 function stopWheel(e){
     if(!e){ e = window.event; } /* IE7, IE8, Chrome, Safari */
     if(e.preventDefault) { e.preventDefault(); } /* Chrome, Safari, Firefox */
     e.returnValue = false; /* IE7, IE8 */
 }
+
+setInterval(function(){
+    jscontent = quill.getContents();
+    strcontent = JSON.stringify(jscontent.ops);
+    $("#id_bio").val(strcontent);
+}, 100);
+
+$("#save").click(function(){
+    console.log(profileid);
+    const userdata = new FormData();
+    const profiledata = new FormData();
+
+    userdata.set("first_name", $("#fname").val());
+    userdata.set("last_name", $("#lname").val());
+    userdata.set("email", $("#email").val());
+
+    jscontent = quill.getContents();
+    strcontent = JSON.stringify(jscontent.ops);
+
+    profiledata.set("bio", strcontent);
+    profiledata.set("avatar", $("#avatar").attr("src"));
+
+    $.ajax({
+        url: '/api/accounts/'+profileid+'/profile/',
+        processData: false,
+        method: 'PUT',
+        dataType: "json",
+        contentType: false,
+        data: profiledata,
+        success: function(t) {
+            console.log(t);
+            $.ajax({
+                url: '/api/accounts/'+userid+'/user/',
+                processData: false,
+                method: 'PUT',
+                dataType: "json",
+                contentType: false,
+                data: userdata,
+                success: function(t) {
+                    location.reload();
+                },error: function(t) {
+                    console.log(t);
+                }
+            });
+        },error: function(t) {
+            console.log(t);
+        }
+    });
+});
+
+$("#fname").change(function() {
+    console.log($("#fname").innerWidth());
+})

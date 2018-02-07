@@ -2,6 +2,7 @@ import urllib.parse
 
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -82,7 +83,7 @@ def post_detail(request, id=None):
 		)
 		return HttpResponseRedirect(new_comment.content_object.get_absolute_url())
 
-	comments = instance.comments
+	comments = instance.comments.order_by('-timestamp')
 
 	context = {
 		"title": instance.title,
@@ -102,8 +103,6 @@ def post_list(request):
 		Q(private=False)).distinct() # .filter(draft=False).filter(publish__lte=timezone.now())
 	queryset_list.update(published=True)
 	carousel_list = queryset_list[:3]
-	if request.user.is_staff or request.user.is_superuser:
-		queryset_list = Post.objects.all().filter(draft=False)
 
 	query = request.GET.get("q")
 	if query:
@@ -165,13 +164,20 @@ def post_delete(request, id=None):
 	messages.success(request, "Successfully deleted")
 	return redirect("posts:list")
 
-def post_draft(request):
+def post_draft(request, username=None):
 	today = timezone.now().date()
-	if not request.user.is_authenticated:
-		raise Http404
-	queryset_list = Post.objects.all().filter(user=request.user) # .filter(draft=False).filter(publish__lte=timezone.now())
-	if request.user.is_staff or request.user.is_superuser:
-		queryset_list = Post.objects.all().filter(user=request.user)
+	if request.user.username == username:
+		is_user = True
+	else:
+		is_user = False
+	target = User.objects.all().filter(username=username)
+	queryset_list = Post.objects.all().filter(user=target).filter(
+		(Q(draft=False) |
+		(Q(draft=True) & Q(published=True))) & 
+		Q(publish__lte=timezone.now()) & 
+		Q(private=False)).distinct() # .filter(draft=False).filter(publish__lte=timezone.now())
+	if request.user.username == username:
+		queryset_list = Post.objects.all().filter(user=target)
 
 	draft = request.GET.get("draft")
 	publish = request.GET.get("publish")
@@ -223,5 +229,6 @@ def post_draft(request):
 		"page_request_var": page_request_var,
 		"today": today,
 		"now": timezone.now(),
+		"is_user": is_user,
 	}
 	return render(request, "posts/post_list.html", context)

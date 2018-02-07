@@ -36,8 +36,6 @@
         // end session cookie data setup.
     });
 
-    let Delta = Quill.import('delta');
-
     const data = new FormData();
 
     var feature = document.getElementById('image');
@@ -86,7 +84,7 @@
                 imgurl = policyData.url + policyData.file_bucket_path + policyData.filename;
                 data.append('image', imgurl);
                 if (type == "feature"){
-                    $('.featureImg').html("<img src='" + imgurl + "' alt='featureImg' width='100%'>")
+                    $('.featureImg').html("<img id='feature' src='" + imgurl + "' alt='featureImg' width='100%'>")
                 }else if (type == "post"){
                     saveToServer(imgurl, fileItem.range);
                 }
@@ -192,217 +190,6 @@
                 xhr.send(fd);
             })
     };
-
-    let Inline = Quill.import('blots/inline');
-    let Block = Quill.import('blots/block');
-    let BlockEmbed = Quill.import('blots/block/embed');
-    let Parchment = Quill.import('parchment');
-
-    class DividerBlot extends BlockEmbed { }
-    DividerBlot.blotName = 'divider';
-    DividerBlot.tagName = 'hr';
-
-    class ImageBlot extends BlockEmbed {
-        static create(value) {
-            let node = super.create();
-            node.innerHTML = "<img class='image' src='"+value.url+"' alt='"+value.alt+"'><br><input class='"+value.url+"' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
-            return node;
-        }
-
-        static value(node) {
-            if (node.querySelector(".image")){
-                return {
-                    alt: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEaLtcApTiOn",
-                    url: node.querySelector(".image").getAttribute('src'),
-                    text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn"
-                };
-            }else{
-                return {
-                    alt: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEaLtcApTiOn",
-                    url: "",
-                    text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEcApTiOn"
-                };
-            }
-        }
-    }
-    ImageBlot.blotName = 'imagewithcaption';
-    ImageBlot.tagName = 'div';
-
-    class ProgressBlot extends BlockEmbed {
-        static create(value) {
-            let node = super.create();
-            node.setAttribute('id', value.id);
-            node.innerHTML = value.name + "<br/>" + "<div class=\"progress\">" + "<div class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" style='width:" + value.progress + "%' aria-valuenow='" + value.progress + "' aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div>";
-            return node;
-        }
-    }
-    ProgressBlot.blotName = 'progress';
-    ProgressBlot.tagName = 'div';
-
-    class YTVideoBlot extends BlockEmbed {
-        static create(url) {
-        let node = super.create();
-        node.setAttribute('src', url);
-        node.setAttribute('frameborder', '0');
-        node.setAttribute('allowfullscreen', true);
-        return node;
-        }
-
-        static formats(node) {
-            let format = {};
-            if (node.hasAttribute('height')) {
-                format.height = node.getAttribute('height');
-            }
-            if (node.hasAttribute('width')) {
-                format.width = node.getAttribute('width');
-            }
-            return format;
-        }
-
-        static value(node) {
-            return node.getAttribute('src');
-        }
-
-        format(name, value) {
-            if (name === 'height' || name === 'width') {
-                if (value) {
-                    this.domNode.setAttribute(name, value);
-                } else {
-                    this.domNode.removeAttribute(name, value);
-                }
-            } else {
-                super.format(name, value);
-            }
-        }
-    }
-    YTVideoBlot.blotName = 'ytvideo';
-    YTVideoBlot.tagName = 'iframe';
-
-    class VideoBlot extends BlockEmbed {
-        static create(value) {
-            let node = super.create();
-            node.innerHTML = "<video class='video' preload='auto' autoplay='autoplay' loop='loop' muted='muted' src='"+value.url+"'></video><br><input class='"+value.url+"' type='text' placeholder='Caption (optional)' value='"+value.text+"' style='text-align: center; border-style: none; color: #bbbbbb; font-style: italic;'><br>";
-            return node;
-        }
-
-        static value(node) {
-            if (node.querySelector(".video")){
-                return {
-                    url: node.querySelector(".video").getAttribute('src'),
-                    text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn"
-                };
-            }else{
-                return {
-                    url: "",
-                    text: "VeRyRaNdOmIzEdDeFaUlTvAlUeOfThEvIdeOcApTiOn"
-                };
-            }
-        }
-    }
-    VideoBlot.blotName = 'videowithcaption';
-    VideoBlot.tagName = 'div';
-
-    Quill.register(ImageBlot);
-    Quill.register(YTVideoBlot);
-    Quill.register(VideoBlot);
-    Quill.register(DividerBlot);
-    Quill.register(ProgressBlot);
-
-    let quill = new Quill('#editor-container', {
-        modules: {
-            clipboard: {
-                matchers: [
-                    ['div', function(node, delta) {
-                        divcontent = new Delta();
-                        for (i = 0; i < node.children.length; i++){
-                            if (node.children[i].tagName == "IMG"){
-                                img = node.children[i];
-                                divcontent.insert({imagewithcaption: {alt: img.alt, url: img.src, text: img.alt}}, {"align": "center"});
-                            }else if (node.children[i].tagName == "VIDEO"){
-                                video = node.children[i];
-                                divcontent.insert({videowithcaption: {url: video.src, text: ""}}, {"align": "center"});
-                            }else{
-                                if (node.children[i].querySelectorAll("img").length != 0){
-                                    for (j = 0; j < node.children[i].querySelectorAll("img").length; j++){
-                                        img = node.children[i].querySelectorAll("img")[j];
-                                        divcontent.insert({imagewithcaption: {alt: img.alt, url: img.src, text: img.alt}}, {"align": "center"});
-                                    }
-                                }
-                                if (node.children[i].querySelectorAll("video").length != 0){
-                                    for (j = 0; j < node.children[i].querySelectorAll("video").length; j++){
-                                        video = node.children[i].querySelectorAll("video")[j];
-                                        divcontent.insert({videowithcaption: {url: video.src, text: ""}}, {"align": "center"});
-                                    }
-                                }
-                                if (node.children[i].textContent){
-                                    divcontent.insert(node.children[i].textContent).insert("\n");
-                                }
-                            }
-                        }
-                        return divcontent;
-                    }],
-                    ['img', function(node, delta) {
-                        // var url = node.src;
-                        // var xhr = new XMLHttpRequest();
-                        // xhr.open('GET', url, true);
-                        // xhr.onload = function(e) {
-                        //     if (this.status == 200) {
-                        //         var imgFile = this.response;
-                        //         imgFile.lastModifiedDate = new Date();
-                        //         imgFile.name = (node.alt) ? node.alt : "copiedImg";
-                        //         console.log(imgFile);
-                        //         copyalt = (node.alt) ? node.alt : "";
-                        //         uploadFile(imgFile, "post");
-                        //     }
-                        // };
-                        // xhr.send();
-
-                        if (node.src){
-                            if (node.alt){
-                                alttext = node.alt;
-                            }else{
-                                alttext = "";
-                            }
-                            return new Delta().insert({imagewithcaption: {alt: node.alt, url: node.src, text: node.alt}}, {"align": "center"});
-                        }
-                        return new Delta();
-                    }],
-                ]
-            },
-            toolbar: [
-                [{ header: [1, 2, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-            ]
-        },
-        scrollingContainer: '#scrolling-container',
-        placeholder: 'Insert text here',
-        theme: 'bubble'
-    });
-
-    // quill.addContainer($("#sidebar-controls").get(0));
-    quill.on(Quill.events.EDITOR_CHANGE, function(eventType, range) {
-        if (eventType !== Quill.events.SELECTION_CHANGE) return;
-        if (range == null) return;
-        if (range.length === 0) {
-            let [block, offset] = quill.scroll.descendant(Block, range.index);
-            if (block != null && block.domNode.firstChild instanceof HTMLBRElement) {
-                let lineBounds = quill.getBounds(range);
-                $('#sidebar-controls').removeClass('active').css('visibility', 'visible');
-                // .css({
-                // left: lineBounds.left - 350,
-                // top: lineBounds.top - 625
-                // });
-            } else {
-                $('#sidebar-controls').css('visibility', 'hidden');;
-                $('#sidebar-controls').removeClass('active');
-            }
-        } else {
-            $('#sidebar-controls, #sidebar-controls').css('visibility', 'hidden');
-            $('#sidebar-controls').removeClass('active');
-            let rangeBounds = quill.getBounds(range);
-        }
-    });
 
     $('#title').blur(function (){
         if (!$('#title').val()){
@@ -539,12 +326,37 @@
         // $('#sidebar-controls').hide();
     });
 
-    $('#test').click(function() {
-        preview = quill.getText();
-        length = preview.length;
-        preview = preview.replace(/[\r\n]+/g, " ").substr(0, 49);
-        if (length > 50){
-            preview = preview.concat("...");
-        }
-        console.log(preview);
-    });
+    // $('#test').click(function() {
+    //     preview = quill.getText();
+    //     length = preview.length;
+    //     preview = preview.replace(/[\r\n]+/g, " ").substr(0, 49);
+    //     if (length > 50){
+    //         preview = preview.concat("...");
+    //     }
+    //     console.log(preview);
+    // });
+
+    // var socialFloat = document.querySelector('#sidebar-controls');
+    // var footer = document.querySelector('#footer');
+    // console.log(socialFloat);
+    // console.log(footer);
+
+    // function checkOffset() {
+    //     function getRectTop(el){
+    //         var rect = el.getBoundingClientRect();
+    //         return rect.top;
+    //     }
+
+    //     if((getRectTop(socialFloat) + document.body.scrollTop) + socialFloat.offsetHeight >= (getRectTop(footer) + document.body.scrollTop) - 10){
+    //         socialFloat.style.position = 'absolute';
+    //         socialFloat.style.bottom = document.querySelector("#contentContainer").getBoundingClientRect().top - document.querySelector("#contentContainer").getBoundingClientRect().bottom - socialFloat.getBoundingClientRect().top + socialFloat.getBoundingClientRect().bottom ;
+    //     }
+    //     if(document.body.scrollTop + window.innerHeight < (getRectTop(footer) + document.body.scrollTop)){
+    //         socialFloat.style.position = 'fixed'; // restore when you scroll up
+    //         socialFloat.style.bottom = 10;
+    //     }
+    // }
+
+    // document.addEventListener("scroll", function(){
+    //     checkOffset();
+    // });

@@ -1,5 +1,5 @@
 p{
-	color: #006600;
+	color: #2c3e50;
 }
 
 .wmd-panel{
@@ -12,17 +12,16 @@ p{
 }
 
 body {
-	padding-top: 100px;
+	padding-top: 60px;
 } 
 
 .card {
-	display: block;
-	padding: 4px;
-	margin-bottom: 21px;
-	background-color: #ffffff;
-	-webkit-transition: border 0.2s ease-in-out;
-	-o-transition: border 0.2s ease-in-out;
-	transition: border 0.2s ease-in-out;
+    display: block;
+    margin-bottom: 21px;
+    background-color: transparent;
+    -webkit-transition: border 0.2s ease-in-out;
+    -o-transition: border 0.2s ease-in-out;
+    transition: border 0.2s ease-in-out;
 }
 
 a {
