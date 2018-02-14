@@ -2,96 +2,99 @@
 {% load staticfiles %}
 
 {% block content %}
-<link href="{% static 'css/profile.css' %}" rel="stylesheet"> 
+<link href="{% static 'css/profile.css' %}" rel="stylesheet">
 
-<div class='row'>
-	<div class="col-sm-6 col-sm-offset-3">
-		<table id="info">
-			<col width="20%">
-			<col width="60%">
-			<col width="20%">
-			<tbody>
-				<tr>
-					<td>
+<div id="content" class="container">
+	<div class='row'>
+		{% include 'settings.html' %}
+
+		<div class="col-sm-6 col-sm-offset-3">
+			<table id="info">
+				<col width="20%">
+				<col width="60%">
+				<col width="20%">
+				<tbody>
+					<tr>
+						<td>
+							{% if is_user %}
+							<a data-toggle="modal" data-target="#myModal"><img id="avatar" src="{{ request.user.profile.avatar }}" class="img-responsive img-circle align-middle" align="middle"></a>
+							{% else %}
+							<img id="avatar" src="{{ user.profile.avatar }}" class="img-responsive img-circle align-middle" align="middle">
+							{% endif %}
+						</td>
 						{% if is_user %}
-						<a data-toggle="modal" data-target="#myModal"><img id="avatar" src="{{ request.user.profile.avatar }}" class="img-responsive img-circle align-middle" align="middle"></a>
+						<td>
+							<h2>
+								<div><small>Edit your name here</small></div>
+								<span contenteditable="true" id="first"></span>
+								<span contenteditable="true" id="last"></span>
+								<input id="fname" type="hidden" value="{{ user.first_name }}">
+								<input id="lname" type="hidden" value="{{ user.last_name }}">
+							</h2>
+						</td>
 						{% else %}
-						<img id="avatar" src="{{ user.profile.avatar }}" class="img-responsive img-circle align-middle" align="middle">
+						<td><h2>{{ user.first_name }} {{ user.last_name }}</h2></td>
 						{% endif %}
-					</td>
+						<td><a href="{% url 'posts:draft' user.username %}" class="btn btn-primary">View posts</a></td>
+					</tr>
 					{% if is_user %}
-					<td>
-						<h2>
-							<div><small>Edit your name here</small></div>
-							<span contenteditable="true" id="first"></span>
-							<span contenteditable="true" id="last"></span>
-							<input id="fname" type="hidden" value="{{ user.first_name }}">
-							<input id="lname" type="hidden" value="{{ user.last_name }}">
-						</h2>
-					</td>
-					{% else %}
-					<td><h2>{{ user.first_name }} {{ user.last_name }}</h2></td>
+					<tr>
+						<td class="avatarTag">
+							<h3>
+								<small>Edit avatar</small>
+							</h3>
+						</td>
+						<td>
+							<h2>
+								<div><small>Edit your email here</small></div>
+								<input id="email" type="text" value="{{ user.email }}">
+							</h2>
+						</td>
+						<td></td>
+					</tr>
 					{% endif %}
-					<td><a href="{% url 'posts:draft' user.username %}" class="btn btn-primary">View posts</a></td>
-				</tr>
+				</tbody>
+			</table>
+			<div id="biography">
+				<h1>Biography</h1>
 				{% if is_user %}
-				<tr>
-					<td class="avatarTag">
-						<h3>
-							<small>Edit avatar</small>
-						</h3>
-					</td>
-					<td>
-						<h2>
-							<div><small>Edit your email here</small></div>
-							<input id="email" type="text" value="{{ user.email }}">
-						</h2>
-					</td>
-					<td></td>
-				</tr>
+				<h1><small>Edit your biography here</small></h1>
 				{% endif %}
-			</tbody>
-		</table>
-		<div id="biography">
-			<h1>Biography</h1>
+			</div>
+			<p id="bio-text" style="display: none;">{{ user.profile.bio }}</p>
+			<article id="editor-container"></article>
 			{% if is_user %}
-			<h1><small>Edit your biography here</small></h1>
+			<button id="save" class="btn btn-primary">Save</button>
 			{% endif %}
 		</div>
-		<p id="bio-text" style="display: none;">{{ user.profile.bio }}</p>
-		<article id="editor-container"></article>
-		{% if is_user %}
-		<button id="save" class="btn btn-primary">Save</button>
-		{% endif %}
-	</div>
 
-	<div id="myModal" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-		<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Change your avatar</h4>
-				</div>
-				<div class="modal-body">
-				    <div class="imageBox">
-				        <div class="thumbBox"></div>
-				        <div class="spinner" style="display: none">Loading...</div>
-				    </div>
-				</div>
-				<div class="modal-footer">
-				    <div class="action">
-				        <input type="file" id="file" class="btn" style="float:left; width: 250px">
-				        <input type="button" id="btnZoomIn" class="btn" value="+" style="float: right">
-				        <input type="button" id="btnZoomOut" class="btn" value="-" style="float: right">
-				        <input type="button" id="crop" class="btn" value="crop" style="float: right">
-				    </div>
+		<div id="myModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+			<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Change your avatar</h4>
+					</div>
+					<div class="modal-body">
+					    <div class="imageBox">
+					        <div class="thumbBox"></div>
+					        <div class="spinner" style="display: none">Loading...</div>
+					    </div>
+					</div>
+					<div class="modal-footer">
+					    <div class="action">
+					        <input type="file" id="file" class="btn" style="float:left; width: 250px">
+					        <input type="button" id="btnZoomIn" class="btn" value="+" style="float: right">
+					        <input type="button" id="btnZoomOut" class="btn" value="-" style="float: right">
+					        <input type="button" id="crop" class="btn" value="crop" style="float: right">
+					    </div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
-
+	
 <link rel="stylesheet" href='{% static "css/cropper.css" %}' type="text/css" />
 
 <script src='{% static "js/cropper.js" %}'></script>

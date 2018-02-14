@@ -46,9 +46,7 @@
                     <ul class="dropdown-menu" role="menu">
                         <p id="greeting" style="padding-left: 10px;">Hello! {{ request.user.first_name }}</p>
                         <li><a href="{% url 'posts:create' %}">Create new post</a></li>
-                        <li><a href="{% url 'posts:draft' request.user.username %}">My posts</a></li>
-                        <li><a href="{% url 'accounts:profile' request.user.username %}">My profile</a></li>
-                        <li><a href="{% url 'password_change' %}">Change Password</a></li>
+                        <li><a href="{% url 'accounts:profile' request.user.username %}">Settings</a></li>
                         <li><a href="{% url 'auth_logout' %}">Logout</a></li>
                     </ul>
                 </li>

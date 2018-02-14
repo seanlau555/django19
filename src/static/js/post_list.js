@@ -27,9 +27,6 @@ $(window).on('resize', function(){
 		$('.titleText').each(function() {
 			var $c = $(this).clone().appendTo('body').css({'display': 'inline', 'width': 'auto', 'font-size': '26px', 'visibility': 'hidden'});
 
-			console.log($c.width())
-			console.log($(this).width());
-
 			if ($(window).width() <= 767) {
 				if ($c.width() > $(".card").width() - 270) {
 					$(this).attr('data-original-title', $(this).text());
@@ -130,7 +127,6 @@ $(document).ready(function(){
             data: data,
             success: function(t) {
                 // var pid=t.id;
-                console.log(t.id);
                 location.reload();
             },error: function(t) {
                 console.log(t);
@@ -154,7 +150,6 @@ $(document).ready(function(){
             data: data,
             success: function(t) {
                 // var pid=t.id;
-                console.log(t.id);
                 location.reload();
             },error: function(t) {
                 console.log(t);

@@ -5,7 +5,7 @@
     left: 0;
     height: 100vh;
     z-index: 999;
-    background: #7386D5;
+    background: #395470;
     color: #fff;
     transition: all 0.3s;
 }
@@ -16,7 +16,7 @@
 
 #sidebar .sidebar-header {
     padding: 20px;
-    background: #6d7fcc;
+    background: #2c3e50;
 }
 
 #sidebar ul.components {
@@ -25,7 +25,7 @@
 }
 
 #sidebar ul p {
-    color: #fff;
+    color: #b4bcc2;
     padding: 10px;
 }
 
@@ -33,20 +33,30 @@
     padding: 10px;
     font-size: 1.1em;
     display: block;
+    color: #b4bcc2;
 }
 #sidebar ul li a:hover {
-    color: #7386D5;
-    background: #fff;
+    color: #395470;
+    background: #b4bcc2;
 }
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
-    color: #fff;
-    background: #6d7fcc;
+    color: #b4bcc2;
+    background: #2c3e50;
 }
 
 #sidebarCollapse {
-	margin-top: 5%;
+	margin-top: 80px;
+}
 
+#sidebar-toggle {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+#sidebar-sub-header {
+	font-size: 24px;
+	padding: 15px;
 }
 
 
@@ -79,10 +89,10 @@ ul.CTAs a {
 }
 a.download {
     background: #fff;
-    color: #7386D5;
+    color: #395470;
 }
 a.article, a.article:hover {
-    background: #6d7fcc !important;
+    background: #2c3e50 !important;
     color: #fff !important;
 }
 
@@ -92,7 +102,6 @@ a.article, a.article:hover {
 ----------------------------------------------------- */
 #content {
     width: calc(100% - 250px);
-    padding: 40px;
     min-height: 100vh;
     transition: all 0.3s;
     position: absolute;

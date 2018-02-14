@@ -1,20 +1,26 @@
-{% extends "base.html" %}
 {% load staticfiles %}
 
-{% block theme %}
-	<link rel="stylesheet" href='{% static "css/settings.css" %}'>
-{% endblock %}
+{% if is_user or sidebar %}
+<link rel="stylesheet" href='{% static "css/settings.css" %}'>
 
-{% block content %}
+<div id="sidebar-toggle">
+    <button type="button" id="sidebarCollapse" class="btn btn-primary navbar-btn">
+        <i class="glyphicon glyphicon-align-left"></i>
+        Toggle Sidebar
+    </button>
+</div>
+
 <div class="wrapper">
     <nav id="sidebar">
         <div class="sidebar-header">
-            <h3>Settings</h3>
+            <img src="{{ request.user.profile.avatar }}" style="width: 200px; vertical-align: middle;" class="img-responsive img-circle align-middle">
+            <h3>{{ request.user.get_full_name }}</h3>
         </div>
 
         <ul class="list-unstyled components">
-            <p>Dummy Heading</p>
-            <li class="active">
+            <span id="sidebar-sub-header">Settings</span>
+            {% comment %}
+            <li>
                 <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">Home</a>
                 <ul class="collapse list-unstyled" id="homeSubmenu">
                     <li><a href="#">Home 1</a></li>
@@ -31,32 +37,26 @@
                     <li><a href="#">Page 3</a></li>
                 </ul>
             </li>
+            {% endcomment %}
             <li>
-                <a href="#">Portfolio</a>
+                <a href="{% url 'posts:draft' request.user.username %}">My Posts</a>
             </li>
             <li>
-                <a href="#">Contact</a>
+                <a href="{% url 'accounts:profile' request.user.username %}">My Profile</a>
             </li>
+            <li>
+            	<a href="{% url 'password_change' %}">Change Password</a>
         </ul>
 
         <ul class="list-unstyled CTAs">
-            <li><a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a></li>
-            <li><a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a></li>
+            <li><a href="{% url 'posts:list' %}" class="download">Back to frontpage</a></li>
+            <li><a href="{% url 'auth_logout' %}" class="article">Logout</a></li>
         </ul>
     </nav>
-
-	<div id="content">
-	    <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
-	        <i class="glyphicon glyphicon-align-left"></i>
-	        Toggle Sidebar
-	    </button>
-	    {% block settings %}
-	    {% endblock %}
-	<div>
 </div>
 
 <!-- Custom Scroller Js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
 <script src='{% static "js/settings.js" %}'></script>
-{% endblock %}
+{% endif %}
