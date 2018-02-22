@@ -8,7 +8,6 @@ function IsJsonString(str) {
 }
 
 if(IsJsonString($("#bio-text").html())){
-    console.log(JSON.parse($("#bio-text").html()));
     quill.setContents(JSON.parse($("#bio-text").html()));
 }
 
@@ -82,6 +81,10 @@ $("#first").blur(function() {
 $("#last").blur(function() {
     $("#lname").val($("#last").html());
 })
+$("#email-display").blur(function() {
+    $("#email").val($("#email-display").html());
+})
+
 
 function constructFormPolicyData(policyData, fileItem) {
     var contentType = fileItem.type != '' ? fileItem.type : 'application/octet-stream'
@@ -202,6 +205,7 @@ $(document).ready(function(){
 
     $("#first").html($("#fname").val());
     $("#last").html($("#lname").val());
+    $("#email-display").html($("#email").val());
 });
 
 $(".imageBox").mouseenter(function(){

@@ -47,7 +47,8 @@
 						<td>
 							<h2>
 								<div><small>Edit your email here</small></div>
-								<input id="email" type="text" value="{{ user.email }}">
+								<div contenteditable="true" id="email-display"></div>
+								<input id="email" type="hidden" value="{{ user.email }}">
 							</h2>
 						</td>
 						<td></td>
